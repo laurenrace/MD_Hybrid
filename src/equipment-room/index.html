@@ -28,35 +28,38 @@
     </div>
 
     <!-- LOBBY CONTROLS -->
-    <div class="row justify-content-center border p-1" id="lobby-controls">
-      <div class="col-3 align-self-center">
-        <div class="select">
-          <label for="videoSource"
-            ><button id="toggleCameraPausedButton" class="buttonActive">
-              CAMERA ON
-            </button></label
-          ><select id="videoSource"></select>
+    <div id="userMediaControls">
+      <div class="row justify-content-center border p-1" id="lobby-controls">
+        <div class="col-3 align-self-center">
+          <div class="select">
+            <label for="videoSource"
+              ><button id="toggleCameraPausedButton" class="buttonActive">
+                CAMERA ON
+              </button></label
+            ><select id="videoSource"></select>
+          </div>
         </div>
-      </div>
 
-      <div class="col-3 align-self-center">
-        <div class="select">
-          <label for="audioSource"
-            ><button id="toggleMicrophonePausedButton" class="buttonActive">
-              MIC ON
-            </button></label
-          ><select id="audioSource"></select>
+        <div class="col-3 align-self-center">
+          <div class="select">
+            <label for="audioSource"
+              ><button id="toggleMicrophonePausedButton" class="buttonActive">
+                MIC ON
+              </button></label
+            ><select id="audioSource"></select>
+          </div>
         </div>
-      </div>
 
-      <div class="col align-self-center" style="display: none">
-        <div class="select">
-          <label for="audioOutput">Audio output destination: </label
-          ><select id="audioOutput"></select>
+        <div class="col align-self-center" style="display: none">
+          <div class="select">
+            <label for="audioOutput">Audio output destination: </label
+            ><select id="audioOutput"></select>
+          </div>
         </div>
       </div>
     </div>
 
+    <script src="../libs/UserMediaControls.js"></script>
     <script type="module" src="./index.js"></script>
   </body>
 </html>
