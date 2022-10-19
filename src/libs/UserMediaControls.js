@@ -1,242 +1,43 @@
 /*
-GetUserMedia requests and UI for camera / mic selection
+class to manage user media controls and user interface.  expects the following HTML:
+
+<div id="userMediaControls">
+  <div class="row justify-content-center border p-1" id="lobby-controls">
+    <div class="col-3 align-self-center">
+      <div class="select">
+        <label for="videoSource"
+          ><button id="toggleCameraPausedButton" class="buttonActive">
+            CAMERA ON
+          </button></label
+        ><select id="videoSource"></select>
+      </div>
+    </div>
+
+    <div class="col-3 align-self-center">
+      <div class="select">
+        <label for="audioSource"
+          ><button id="toggleMicrophonePausedButton" class="buttonActive">
+            MIC ON
+          </button></label
+        ><select id="audioSource"></select>
+      </div>
+    </div>
+
+    <div class="col align-self-center" style="display: none">
+      <div class="select">
+        <label for="audioOutput">Audio output destination: </label
+        ><select id="audioOutput"></select>
+      </div>
+    </div>
+  </div>
+</div>
 
 */
-// let localCam;
-// let cameraPaused = false;
-// let micPaused = false;
-// let hasInitializedCameraAccess = false;
 
-// async function startUserMedia() {
-//   // request user media before getting device list or the browser may not prompt user for access
-//   await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-//   getDevices();
-// }
-
-//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
-// user media
-
-// const cameraPausedButton = document.getElementById("toggleCameraPausedButton");
-// const microphonePausedButton = document.getElementById(
-//   "toggleMicrophonePausedButton"
-// );
-
-// const videoElement = document.getElementById("local_video");
-// const audioInputSelect = document.querySelector("select#audioSource");
-// const audioOutputSelect = document.querySelector("select#audioOutput");
-// const videoInputSelect = document.querySelector("select#videoSource");
-// const selectors = [audioInputSelect, audioOutputSelect, videoInputSelect];
-
-// audioOutputSelect.disabled = !("sinkId" in HTMLMediaElement.prototype);
-
-// audioInputSelect.addEventListener("change", startStream);
-// videoInputSelect.addEventListener("change", startStream);
-// audioOutputSelect.addEventListener("change", changeAudioDestination);
-
-// async function getDevices() {
-//   let devicesInfo = await navigator.mediaDevices.enumerateDevices();
-//   gotDevices(devicesInfo);
-//   await startStream();
-// }
-
-// function gotDevices(deviceInfos) {
-//   // Handles being called several times to update labels. Preserve values.
-//   const values = selectors.map((select) => select.value);
-//   selectors.forEach((select) => {
-//     while (select.firstChild) {
-//       select.removeChild(select.firstChild);
-//     }
-//   });
-//   for (let i = 0; i !== deviceInfos.length; ++i) {
-//     const deviceInfo = deviceInfos[i];
-//     const option = document.createElement("option");
-//     option.value = deviceInfo.deviceId;
-//     if (deviceInfo.kind === "audioinput") {
-//       option.text =
-//         deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
-//       audioInputSelect.appendChild(option);
-//     } else if (deviceInfo.kind === "audiooutput") {
-//       option.text =
-//         deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
-//       audioOutputSelect.appendChild(option);
-//     } else if (deviceInfo.kind === "videoinput") {
-//       option.text = deviceInfo.label || `camera ${videoInputSelect.length + 1}`;
-//       videoInputSelect.appendChild(option);
-//     } else {
-//       console.log("Some other kind of source/device: ", deviceInfo);
-//     }
-//   }
-//   selectors.forEach((select, selectorIndex) => {
-//     if (
-//       Array.prototype.slice
-//         .call(select.childNodes)
-//         .some((n) => n.value === values[selectorIndex])
-//     ) {
-//       select.value = values[selectorIndex];
-//     }
-//   });
-// }
-
-// function gotStream(stream) {
-//   localCam = stream; // make stream available to console
-
-//   cameraPaused = false;
-//   micPaused = false;
-//   updateCameraPausedButton();
-//   updateMicPausedButton();
-
-//   const videoTrack = localCam.getVideoTracks()[0];
-//   const audioTrack = localCam.getAudioTracks()[0];
-
-//   let videoStream = new MediaStream([videoTrack]);
-//   if ("srcObject" in videoElement) {
-//     videoElement.srcObject = videoStream;
-//   } else {
-//     videoElement.src = window.URL.createObjectURL(videoStream);
-//   }
-
-//   videoElement.play();
-
-//   mediasoupPeer.addTrack(videoTrack, "video");
-//   mediasoupPeer.addTrack(audioTrack, "audio");
-
-//   // Refresh button list in case labels have become available
-//   return navigator.mediaDevices.enumerateDevices();
-// }
-
-// function handleError(error) {
-//   console.error(
-//     "navigator.MediaDevices.getUserMedia error: ",
-//     error.message,
-//     error.name
-//   );
-// }
-
-// // Attach audio output device to video element using device/sink ID.
-// function attachSinkId(element, sinkId) {
-//   if (typeof element.sinkId !== "undefined") {
-//     element
-//       .setSinkId(sinkId)
-//       .then(() => {
-//         console.log(`Success, audio output device attached: ${sinkId}`);
-//       })
-//       .catch((error) => {
-//         let errorMessage = error;
-//         if (error.name === "SecurityError") {
-//           errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-//         }
-//         console.error(errorMessage);
-//         // Jump back to first output device in the list as it's the default.
-//         audioOutputSelect.selectedIndex = 0;
-//       });
-//   } else {
-//     console.warn("Browser does not support output device selection.");
-//   }
-// }
-
-// function changeAudioDestination() {
-//   const audioDestination = audioOutputSelect.value;
-//   attachSinkId(videoElement, audioDestination);
-// }
-
-// async function startStream() {
-//   console.log("getting local stream");
-//   if (localCam) {
-//     localCam.getTracks().forEach((track) => {
-//       track.stop();
-//     });
-//   }
-
-//   const audioSource = audioInputSelect.value;
-//   const videoSource = videoInputSelect.value;
-//   const constraints = {
-//     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
-//     video: {
-//       deviceId: videoSource ? { exact: videoSource } : undefined,
-//       width: { ideal: 320 },
-//       height: { ideal: 240 },
-//     },
-//   };
-//   navigator.mediaDevices
-//     .getUserMedia(constraints)
-//     .then(gotStream)
-//     .then(gotDevices)
-//     .catch(handleError);
-// }
-
-// //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
-
-// function pauseVideo() {
-//   if (!localCam) return;
-//   localCam.getVideoTracks()[0].enabled = false;
-//   cameraPaused = true;
-//   updateCameraPausedButton();
-// }
-
-// function resumeVideo() {
-//   if (!localCam) return;
-//   localCam.getVideoTracks()[0].enabled = true;
-//   cameraPaused = false;
-//   updateCameraPausedButton();
-// }
-
-// function pauseMic() {
-//   if (!localCam) return;
-//   localCam.getAudioTracks()[0].enabled = false;
-//   micPaused = true;
-//   updateMicPausedButton();
-// }
-
-// function resumeMic() {
-//   if (!localCam) return;
-//   localCam.getAudioTracks()[0].enabled = true;
-//   micPaused = false;
-//   updateMicPausedButton();
-// }
-
-// function updateCameraPausedButton() {
-//   if (cameraPaused) {
-//     cameraPausedButton.innerText = "CAMERA OFF";
-//     cameraPausedButton.classList.remove("buttonActive");
-//     cameraPausedButton.classList.add("buttonInactive");
-//   } else {
-//     cameraPausedButton.innerText = "CAMERA ON";
-//     cameraPausedButton.classList.remove("buttonInactive");
-//     cameraPausedButton.classList.add("buttonActive");
-//   }
-// }
-
-// function updateMicPausedButton() {
-//   if (micPaused) {
-//     microphonePausedButton.innerText = "MIC OFF";
-//     microphonePausedButton.classList.remove("buttonActive");
-//     microphonePausedButton.classList.add("buttonInactive");
-//   } else {
-//     microphonePausedButton.innerText = "MIC ON";
-//     microphonePausedButton.classList.remove("buttonInactive");
-//     microphonePausedButton.classList.add("buttonActive");
-//   }
-// }
-
-// cameraPausedButton.addEventListener("click", () => {
-//   if (cameraPaused) {
-//     resumeVideo();
-//   } else {
-//     pauseVideo();
-//   }
-// });
-
-// microphonePausedButton.addEventListener("click", () => {
-//   if (micPaused) {
-//     resumeMic();
-//   } else {
-//     pauseMic();
-//   }
-// });
-
-class UserMediaControls {
-  constructor() {
+export class UserMediaControls {
+  constructor(mediasoupPeer) {
     this.localCam;
+    this.mediasoupPeer = mediasoupPeer;
     this.cameraPaused = false;
     this.micPaused = false;
     this.hasInitializedCameraAccess = false;
@@ -359,8 +160,8 @@ class UserMediaControls {
 
     this.videoElement.play();
 
-    // mediasoupPeer.addTrack(videoTrack, "video");
-    // mediasoupPeer.addTrack(audioTrack, "audio");
+    this.mediasoupPeer.addTrack(videoTrack, "video", true);
+    this.mediasoupPeer.addTrack(audioTrack, "audio");
 
     // Refresh button list in case labels have become available
     return navigator.mediaDevices.enumerateDevices();

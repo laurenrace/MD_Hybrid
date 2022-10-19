@@ -20,7 +20,19 @@
   </head>
 
   <body>
-    <canvas id="main-canvas"></canvas>
+    <div id="canvasContainer"></div>
+
+    <!-- TEST VIDEO -->
+    <video
+      id="testVideo"
+      loop
+      muted
+      crossorigin="anonymous"
+      playsinline
+      style="display: none"
+    >
+      <source src="./video.mp4" />
+    </video>
 
     <!-- LOCAL VIDEO -->
     <div style="display: none">
@@ -59,7 +71,6 @@
       </div>
     </div>
 
-    <script src="../libs/UserMediaControls.js"></script>
     <script type="module" src="./index.js"></script>
   </body>
 </html>
