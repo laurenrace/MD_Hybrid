@@ -197,15 +197,7 @@ class PortalScene {
   }
 
   addEquirectangularVideo(videoEl) {
-    const geometry = new THREE.SphereGeometry(
-      10,
-      60,
-      40,
-      0,
-      Math.PI,
-      0,
-      Math.PI / 2
-    );
+    const geometry = new THREE.SphereGeometry(10, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
 

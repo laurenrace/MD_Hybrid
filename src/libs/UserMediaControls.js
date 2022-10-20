@@ -216,8 +216,6 @@ export class UserMediaControls {
       audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
       video: {
         deviceId: videoSource ? { exact: videoSource } : undefined,
-        width: { ideal: 320 },
-        height: { ideal: 240 },
       },
     };
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
