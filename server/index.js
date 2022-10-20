@@ -1,7 +1,8 @@
 // HTTP Server setup:
 // https://stackoverflow.com/questions/27393705/how-to-resolve-a-socket-io-404-not-found-error
 const express = require("express");
-const https = require("https");
+// const https = require("https");
+const http = require("http");
 const Datastore = require("nedb");
 const MediasoupManager = require("simple-mediasoup-peer-server");
 const devcert = require("devcert");
@@ -14,14 +15,15 @@ let shouldShowChat = false;
 async function main() {
   const app = express();
 
-  const ssl = await devcert.certificateFor("localhost");
-  const server = https.createServer(ssl, app);
+  // const ssl = await devcert.certificateFor("localhost");
+  // const server = https.createServer(ssl, app);
+  const server = http.createServer(app);
 
   const distFolder = process.cwd() + "/dist";
   console.log("Serving static files at ", distFolder);
   app.use(express.static(process.cwd() + "/dist"));
 
-  const port = 443;
+  const port = 91919;
   server.listen(port);
   console.log(`Server listening on port ${port}`);
 
@@ -43,10 +45,10 @@ async function main() {
   io.on("connection", (socket) => {
     console.log(
       "User " +
-        socket.id +
-        " connected, there are " +
-        io.engine.clientsCount +
-        " clients connected"
+      socket.id +
+      " connected, there are " +
+      io.engine.clientsCount +
+      " clients connected"
     );
 
     // send chat
