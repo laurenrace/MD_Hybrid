@@ -9,7 +9,6 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 let socket;
 let mediasoupPeer;
-
 let portalScene;
 
 let peers = {};
@@ -19,7 +18,9 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
-  socket = io("https://localhost");
+  socket = io("https://yorb.itp.io", {
+    path: "/hybrid/socket.io"
+  });
 
   socket.on("clients", (ids) => {
     console.log("Got initial clients!");
@@ -68,7 +69,7 @@ function gotTrack(track, id, label) {
 
       // el.style = "visibility: hidden;";
       document.body.appendChild(el);
-      portalScene.addEquirectangularVideo(el);
+      portalScene.addWebcamVideo(el);
     }
   }
 
@@ -96,13 +97,17 @@ function gotTrack(track, id, label) {
 
 class PortalScene {
   constructor() {
+    this.BACKGROUND_LAYER = 10;
     this.scene = new THREE.Scene();
-
-    this.portalWidth = 5;
-    this.portalHeight = 5;
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+
+    this.aspect = this.width / this.height;
+    console.log("Aspect ratio: ", this.aspect);
+
+    this.portalWidth = 6;
+    this.portalHeight = this.portalWidth / this.aspect;
 
     this.camera = new THREE.PerspectiveCamera(
       50,
@@ -131,6 +136,11 @@ class PortalScene {
 
     // orbit controls for testing
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
+    // controls.maxAzimuthAngle = (Math.PI / 2) * 0.75;
+    // controls.minAzimuthAngle = (-Math.PI / 2) * 0.75;
+    // controls.maxPolarAngle = Math.PI * 0.75;
+    // controls.minPolarAngle = Math.PI * 0.25;
+    // console.log(controls);
 
     const domElement = document.getElementById("canvasContainer");
     //Push the canvas to the DOM
@@ -142,7 +152,7 @@ class PortalScene {
 
     // Helpers
     this.helperGrid = new THREE.GridHelper(500, 500);
-    this.helperGrid.position.y = -2; // offset the grid down to avoid z fighting with floor
+    this.helperGrid.position.y = -this.portalHeight / 2 - 0.01; // offset the grid down to avoid z fighting with floor
     this.scene.add(this.helperGrid);
 
     // setup GLTF / Draco Loader
@@ -158,6 +168,8 @@ class PortalScene {
     this.gltfLoader = new GLTFLoader();
     this.gltfLoader.setDRACOLoader(dracoLoader);
 
+    this.setupCubeCameraForEnvironment();
+
     this.addEnvironment();
     this.addLights();
     this.addStencil();
@@ -167,6 +179,43 @@ class PortalScene {
     this.addEquirectangularVideo(video);
 
     this.loop();
+  }
+
+  addWebcamVideo(videoEl) {
+    console.log('adding webcam video', videoEl);
+    const geometry = new THREE.PlaneGeometry(4, 4);
+    // invert the geometry on the x-axis so that all of the faces point inward
+    // geometry.scale(-1, 1, 1);
+
+    const texture = new THREE.VideoTexture(videoEl);
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    mesh.position.set(0, 0, 2);
+    mesh.layers.set(this.BACKGROUND_LAYER);
+    this.scene.add(mesh);
+  }
+
+  // setup environment mapping which may be useful or interesting!
+  setupCubeCameraForEnvironment() {
+    this.cubeRenderTarget = new THREE.WebGLCubeRenderTarget(1024);
+    this.cubeRenderTarget.texture.type = THREE.HalfFloatType;
+
+    this.cubeCamera = new THREE.CubeCamera(1, 1000, this.cubeRenderTarget);
+    this.cubeCamera.layers.set(this.BACKGROUND_LAYER);
+
+    const material = new THREE.MeshStandardMaterial({
+      // map: this.cubeRenderTarget.texture,
+      color: 0xffffff,
+      envMap: this.cubeRenderTarget.texture,
+      roughness: 0.01,
+      metalness: 0.99,
+      side: THREE.DoubleSide
+    });
+
+    const sphere = new THREE.Mesh(new THREE.IcosahedronGeometry(5, 8), material);
+    this.scene.add(sphere);
   }
 
   addLights() {
@@ -192,12 +241,15 @@ class PortalScene {
     console.log(modelURL);
     this.gltfLoader.load(modelURL.href, (gltf) => {
       this.scene.add(gltf.scene);
+      gltf.scene.children[0].material.roughness = 1;
+      console.log(gltf.scene.children[0].material);
       gltf.scene.position.set(0, -this.portalHeight / 2, -5);
     });
+
   }
 
   addEquirectangularVideo(videoEl) {
-    const geometry = new THREE.SphereGeometry(10, 60, 40);
+    const geometry = new THREE.SphereGeometry(100, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
 
@@ -205,25 +257,24 @@ class PortalScene {
     const material = new THREE.MeshBasicMaterial({ map: texture });
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.rotateY(Math.PI);
-    mesh.position.set(0, -this.portalHeight / 2, 0);
     this.scene.add(mesh);
+    mesh.layers.set(this.BACKGROUND_LAYER);
   }
 
   addPortalSides() {
-    const normalMap = new THREE.CanvasTexture(new FlakesTexture());
-    normalMap.wrapS = THREE.RepeatWrapping;
-    normalMap.wrapT = THREE.RepeatWrapping;
-    normalMap.repeat.x = 10;
-    normalMap.repeat.y = 6;
-    normalMap.anisotropy = 16;
+    // const normalMap = new THREE.CanvasTexture(new FlakesTexture());
+    // normalMap.wrapS = THREE.RepeatWrapping;
+    // normalMap.wrapT = THREE.RepeatWrapping;
+    // normalMap.repeat.x = 10;
+    // normalMap.repeat.y = 6;
+    // normalMap.anisotropy = 16;
     const sharedMaterialProps = {
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
-      metalness: 0.9,
-      roughness: 0.5,
-      normalMap,
-      normalScale: new THREE.Vector2(0.25, 0.25),
+      // clearcoat: 1.0,
+      // clearcoatRoughness: 0.1,
+      // metalness: 0.9,
+      // roughness: 0.5,
+      // normalMap,
+      // normalScale: new THREE.Vector2(0.25, 0.25),
     };
     const sideDepth = 1;
     // left
@@ -237,6 +288,7 @@ class PortalScene {
     side.position.set(-this.portalWidth / 2, 0, -sideDepth / 2);
     side.rotateY(Math.PI / 2);
     this.scene.add(side);
+    this.portalLeftMesh = side;
 
     // right
     geo = new THREE.PlaneGeometry(sideDepth, this.portalHeight);
@@ -250,6 +302,8 @@ class PortalScene {
     side.rotateY(-Math.PI / 2);
     this.scene.add(side);
 
+    this.portalRightMesh = side;
+
     // top
     geo = new THREE.PlaneGeometry(this.portalWidth, sideDepth);
     mat = new THREE.MeshPhongMaterial({
@@ -262,6 +316,8 @@ class PortalScene {
     side.rotateX(Math.PI / 2);
     this.scene.add(side);
 
+    this.portalTopMesh = side;
+
     // bottom
     geo = new THREE.PlaneGeometry(this.portalWidth, sideDepth);
     mat = new THREE.MeshPhongMaterial({
@@ -273,6 +329,8 @@ class PortalScene {
     side.position.set(0, -this.portalHeight / 2, -sideDepth / 2);
     side.rotateX(-Math.PI / 2);
     this.scene.add(side);
+
+    this.portalBottomMesh = side;
   }
 
   addStencil() {
@@ -287,7 +345,11 @@ class PortalScene {
   }
 
   loop() {
-    this.render();
+
+    // controls wander back to center
+    this.cubeCamera.update(this.renderer, this.scene);
+    this.renderer.render(this.scene, this.camera);
+    // this.render();
 
     window.requestAnimationFrame(() => this.loop());
   }
@@ -336,7 +398,9 @@ class PortalScene {
     gl.colorMask(false, false, false, false);
     gl.depthMask(false);
 
+
     this.renderer.render(this.scene, this.camera);
+
 
     // SECOND PASS
 
@@ -355,6 +419,9 @@ class PortalScene {
     gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
 
     this.camera.layers.set(0); // layer 0 contains everything but plane
+
+
+    this.cubeCamera.update(this.renderer, this.scene);
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -363,11 +430,13 @@ class PortalScene {
   // Event Handlers 🍽
 
   onWindowResize(e) {
-    this.width = window.innerWidth * 0.9;
-    this.height = window.innerHeight * 0.7;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.width, this.height);
+
+
   }
 
   onMouseMove(event) {
@@ -378,3 +447,7 @@ class PortalScene {
     this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   }
 }
+
+
+
+const map = (value, x1, y1, x2, y2) => (value - x1) * (y2 - x2) / (y1 - x1) + x2;
