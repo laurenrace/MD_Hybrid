@@ -153,9 +153,9 @@ class PortalScene {
     window.addEventListener("mousemove", (e) => this.onMouseMove(e), false);
 
     // Helpers
-    this.helperGrid = new THREE.GridHelper(500, 500);
-    this.helperGrid.position.y = -this.portalHeight / 2 - 0.01; // offset the grid down to avoid z fighting with floor
-    this.scene.add(this.helperGrid);
+    // this.helperGrid = new THREE.GridHelper(500, 500);
+    // this.helperGrid.position.y = -this.portalHeight / 2 - 0.01; // offset the grid down to avoid z fighting with floor
+    // this.scene.add(this.helperGrid);
 
     // setup GLTF / Draco Loader
     // const dracoURL = new URL("../libs/draco", import.meta.url);
@@ -239,14 +239,24 @@ class PortalScene {
   }
 
   addEnvironment() {
+    const textureURL = new URL(
+      "../assets/laminate_floor_diff_1k.jpg",
+      import.meta.url
+    );
+
+    const tex = new THREE.TextureLoader().load(textureURL);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(100, 100);
     const groundMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(20, 20),
-      new THREE.MeshPhongMaterial({ color: "blue" })
+      new THREE.PlaneGeometry(1000, 1000),
+      new THREE.MeshPhongMaterial({ color: "white", map: tex })
     );
 
     this.scene.add(groundMesh);
     groundMesh.rotateX(-Math.PI / 2);
     groundMesh.position.set(0, -this.portalHeight / 2 - 0.025, 0);
+    this.groundMesh = groundMesh;
 
     const modelURL = new URL("../assets/rock.glb", import.meta.url);
     console.log(modelURL);
@@ -362,6 +372,7 @@ class PortalScene {
     );
 
     this.stencilMesh.scale.set(this.portalWidth, this.portalHeight, 1);
+    this.groundMesh.position.set(0, -this.portalHeight / 2 - 0.025, 0);
   }
 
   addPortalSides() {
