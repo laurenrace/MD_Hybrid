@@ -20,7 +20,19 @@
   </head>
 
   <body>
-    <canvas id="main-canvas"></canvas>
+    <div id="canvasContainer"></div>
+
+    <!-- TEST VIDEO -->
+    <video
+      id="testVideo"
+      loop
+      muted
+      crossorigin="anonymous"
+      playsinline
+      style="display: none"
+    >
+      <source src="./video.mp4" />
+    </video>
 
     <!-- LOCAL VIDEO -->
     <div style="display: none">
@@ -28,31 +40,33 @@
     </div>
 
     <!-- LOBBY CONTROLS -->
-    <div class="row justify-content-center border p-1" id="lobby-controls">
-      <div class="col-3 align-self-center">
-        <div class="select">
-          <label for="videoSource"
-            ><button id="toggleCameraPausedButton" class="buttonActive">
-              CAMERA ON
-            </button></label
-          ><select id="videoSource"></select>
+    <div id="userMediaControls">
+      <div class="row justify-content-center border p-1" id="lobby-controls">
+        <div class="col-3 align-self-center">
+          <div class="select">
+            <label for="videoSource"
+              ><button id="toggleCameraPausedButton" class="buttonActive">
+                CAMERA ON
+              </button></label
+            ><select id="videoSource"></select>
+          </div>
         </div>
-      </div>
 
-      <div class="col-3 align-self-center">
-        <div class="select">
-          <label for="audioSource"
-            ><button id="toggleMicrophonePausedButton" class="buttonActive">
-              MIC ON
-            </button></label
-          ><select id="audioSource"></select>
+        <div class="col-3 align-self-center">
+          <div class="select">
+            <label for="audioSource"
+              ><button id="toggleMicrophonePausedButton" class="buttonActive">
+                MIC ON
+              </button></label
+            ><select id="audioSource"></select>
+          </div>
         </div>
-      </div>
 
-      <div class="col align-self-center" style="display: none">
-        <div class="select">
-          <label for="audioOutput">Audio output destination: </label
-          ><select id="audioOutput"></select>
+        <div class="col align-self-center" style="display: none">
+          <div class="select">
+            <label for="audioOutput">Audio output destination: </label
+            ><select id="audioOutput"></select>
+          </div>
         </div>
       </div>
     </div>
