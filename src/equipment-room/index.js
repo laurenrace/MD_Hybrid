@@ -18,9 +18,10 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
-  socket = io("https://yorb.itp.io", {
-    path: "/hybrid/socket.io"
-  });
+  // socket = io("https://yorb.itp.io", {
+  //   path: "/hybrid/socket.io"
+  // });
+  socket = io("http://localhost:65156");
 
   socket.on("clients", (ids) => {
     console.log("Got initial clients!");
@@ -69,7 +70,6 @@ function gotTrack(track, id, label) {
 
       // el.style = "visibility: hidden;";
       document.body.appendChild(el);
-      portalScene.addWebcamVideo(el);
     }
   }
 
@@ -89,6 +89,9 @@ function gotTrack(track, id, label) {
   el.srcObject = new MediaStream([track]);
 
   el.onloadedmetadata = (e) => {
+    if (track.kind === "video") {
+      portalScene.addWebcamVideo(el);
+    }
     el.play().catch((e) => {
       console.log("Play Error: " + e);
     });
@@ -136,11 +139,10 @@ class PortalScene {
 
     // orbit controls for testing
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
-    // controls.maxAzimuthAngle = (Math.PI / 2) * 0.75;
-    // controls.minAzimuthAngle = (-Math.PI / 2) * 0.75;
-    // controls.maxPolarAngle = Math.PI * 0.75;
-    // controls.minPolarAngle = Math.PI * 0.25;
-    // console.log(controls);
+    controls.maxAzimuthAngle = (Math.PI / 2) * 0.75;
+    controls.minAzimuthAngle = (-Math.PI / 2) * 0.75;
+    controls.maxPolarAngle = Math.PI * 0.75;
+    controls.minPolarAngle = Math.PI * 0.25;
 
     const domElement = document.getElementById("canvasContainer");
     //Push the canvas to the DOM
@@ -168,12 +170,14 @@ class PortalScene {
     this.gltfLoader = new GLTFLoader();
     this.gltfLoader.setDRACOLoader(dracoLoader);
 
-    this.setupCubeCameraForEnvironment();
+    // this.setupCubeCameraForEnvironment();
 
     this.addEnvironment();
     this.addLights();
     this.addStencil();
-    this.addPortalSides();
+    // this.addPortalSides();
+    this.createPortalSides();
+    this.resizePortalMeshes();
     const video = document.getElementById("testVideo");
     video.play();
     this.addEquirectangularVideo(video);
@@ -182,18 +186,22 @@ class PortalScene {
   }
 
   addWebcamVideo(videoEl) {
-    console.log('adding webcam video', videoEl);
-    const geometry = new THREE.PlaneGeometry(4, 4);
+    const aspect = videoEl.offsetWidth / videoEl.offsetHeight;
+    console.log("adding webcam video");
+    const geometry = new THREE.PlaneGeometry(4, 4 / aspect);
     // invert the geometry on the x-axis so that all of the faces point inward
     // geometry.scale(-1, 1, 1);
 
     const texture = new THREE.VideoTexture(videoEl);
-    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+    });
 
     const mesh = new THREE.Mesh(geometry, material);
 
-    mesh.position.set(0, 0, 2);
-    mesh.layers.set(this.BACKGROUND_LAYER);
+    mesh.position.set(2 * (Math.random() - 0.5), 2 * Math.random(), -5);
+    // mesh.layers.set(this.BACKGROUND_LAYER);
     this.scene.add(mesh);
   }
 
@@ -211,10 +219,13 @@ class PortalScene {
       envMap: this.cubeRenderTarget.texture,
       roughness: 0.01,
       metalness: 0.99,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
     });
 
-    const sphere = new THREE.Mesh(new THREE.IcosahedronGeometry(5, 8), material);
+    const sphere = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(5, 8),
+      material
+    );
     this.scene.add(sphere);
   }
 
@@ -245,11 +256,10 @@ class PortalScene {
       console.log(gltf.scene.children[0].material);
       gltf.scene.position.set(0, -this.portalHeight / 2, -5);
     });
-
   }
 
   addEquirectangularVideo(videoEl) {
-    const geometry = new THREE.SphereGeometry(100, 60, 40);
+    const geometry = new THREE.SphereGeometry(25, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
 
@@ -258,7 +268,100 @@ class PortalScene {
 
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
-    mesh.layers.set(this.BACKGROUND_LAYER);
+    // mesh.layers.set(this.BACKGROUND_LAYER);
+  }
+
+  createPortalSides() {
+    // const normalMap = new THREE.CanvasTexture(new FlakesTexture());
+    // normalMap.wrapS = THREE.RepeatWrapping;
+    // normalMap.wrapT = THREE.RepeatWrapping;
+    // normalMap.repeat.x = 10;
+    // normalMap.repeat.y = 6;
+    // normalMap.anisotropy = 16;
+    const sharedMaterialProps = {
+      // clearcoat: 1.0,
+      // clearcoatRoughness: 0.1,
+      // metalness: 0.9,
+      // roughness: 0.5,
+      // normalMap,
+      // normalScale: new THREE.Vector2(0.25, 0.25),
+    };
+    const sideDepth = 1;
+    // left
+    let geo = new THREE.PlaneGeometry(1, 1);
+    let mat = new THREE.MeshPhongMaterial({
+      color: 0xff00ff,
+      side: THREE.DoubleSide,
+      ...sharedMaterialProps,
+    });
+    let side = new THREE.Mesh(geo, mat);
+    // side.position.set(-this.portalWidth / 2, 0, -sideDepth / 2);
+    side.rotateY(Math.PI / 2);
+    this.scene.add(side);
+    this.portalLeftMesh = side;
+
+    // right
+    // geo = new THREE.PlaneGeometry(1,1);
+    mat = new THREE.MeshPhongMaterial({
+      color: 0xffeeaa,
+      side: THREE.DoubleSide,
+      ...sharedMaterialProps,
+    });
+    side = new THREE.Mesh(geo, mat);
+    // side.position.set(this.portalWidth / 2, 0, -sideDepth / 2);
+    side.rotateY(-Math.PI / 2);
+    this.scene.add(side);
+
+    this.portalRightMesh = side;
+
+    // top
+    // geo = new THREE.PlaneGeometry(1,1);
+    mat = new THREE.MeshPhongMaterial({
+      color: 0xbbcc33,
+      side: THREE.DoubleSide,
+      ...sharedMaterialProps,
+    });
+    side = new THREE.Mesh(geo, mat);
+    // side.position.set(0, this.portalHeight / 2, -sideDepth / 2);
+    side.rotateX(Math.PI / 2);
+    this.scene.add(side);
+
+    this.portalTopMesh = side;
+
+    // bottom
+    // geo = new THREE.PlaneGeometry(1,1);
+    mat = new THREE.MeshPhongMaterial({
+      color: 0xffeeaa,
+      side: THREE.DoubleSide,
+      ...sharedMaterialProps,
+    });
+    side = new THREE.Mesh(geo, mat);
+    // side.position.set(0, -this.portalHeight / 2, -sideDepth / 2);
+    side.rotateX(-Math.PI / 2);
+    this.scene.add(side);
+
+    this.portalBottomMesh = side;
+  }
+
+  resizePortalMeshes() {
+    const sideDepth = 1;
+    this.portalLeftMesh.scale.set(sideDepth, this.portalHeight);
+    this.portalLeftMesh.position.set(-this.portalWidth / 2, 0, -sideDepth / 2);
+
+    this.portalRightMesh.scale.set(sideDepth, this.portalHeight);
+    this.portalRightMesh.position.set(this.portalWidth / 2, 0, -sideDepth / 2);
+
+    this.portalTopMesh.scale.set(this.portalWidth, sideDepth);
+    this.portalTopMesh.position.set(0, this.portalHeight / 2, -sideDepth / 2);
+
+    this.portalBottomMesh.scale.set(this.portalWidth, sideDepth);
+    this.portalBottomMesh.position.set(
+      0,
+      -this.portalHeight / 2,
+      -sideDepth / 2
+    );
+
+    this.stencilMesh.scale.set(this.portalWidth, this.portalHeight, 1);
   }
 
   addPortalSides() {
@@ -334,22 +437,24 @@ class PortalScene {
   }
 
   addStencil() {
-    const geo = new THREE.PlaneGeometry(this.portalWidth, this.portalHeight);
+    const geo = new THREE.PlaneGeometry(1, 1);
     const mat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       side: THREE.DoubleSide,
     });
     const mesh = new THREE.Mesh(geo, mat);
     this.scene.add(mesh);
+    mesh.scale.set(this.portalWidth, this.portalHeight, 1);
+    this.stencilMesh = mesh;
+
     mesh.layers.set(1);
   }
 
   loop() {
-
     // controls wander back to center
-    this.cubeCamera.update(this.renderer, this.scene);
-    this.renderer.render(this.scene, this.camera);
-    // this.render();
+    // this.cubeCamera.update(this.renderer, this.scene);
+    // this.renderer.render(this.scene, this.camera);
+    this.render();
 
     window.requestAnimationFrame(() => this.loop());
   }
@@ -398,9 +503,7 @@ class PortalScene {
     gl.colorMask(false, false, false, false);
     gl.depthMask(false);
 
-
     this.renderer.render(this.scene, this.camera);
-
 
     // SECOND PASS
 
@@ -420,8 +523,7 @@ class PortalScene {
 
     this.camera.layers.set(0); // layer 0 contains everything but plane
 
-
-    this.cubeCamera.update(this.renderer, this.scene);
+    // this.cubeCamera.update(this.renderer, this.scene);
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -432,12 +534,22 @@ class PortalScene {
   onWindowResize(e) {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.camera.aspect = this.width / this.height;
+    const aspect = this.width / this.height;
+    this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.width, this.height);
 
-
+    this.portalWidth = 6;
+    this.portalHeight = this.portalWidth / aspect;
+    this.resizePortalMeshes();
   }
+
+  // resizePortalMeshes() {
+  //   this.portalLeftMesh.scale.set(1, 1, 1);
+  //   this.portalRightMesh.scale.set(1, 1, 1);
+  //   this.portalTopMesh.scale.set(1, 1, 1);
+  //   this.portalBottomMesh.scale.set(1, 1, 1);
+  // }
 
   onMouseMove(event) {
     // calculate mouse position in normalized device coordinates
@@ -448,6 +560,5 @@ class PortalScene {
   }
 }
 
-
-
-const map = (value, x1, y1, x2, y2) => (value - x1) * (y2 - x2) / (y1 - x1) + x2;
+const map = (value, x1, y1, x2, y2) =>
+  ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
