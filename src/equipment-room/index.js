@@ -10,6 +10,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 let socket;
 let mediasoupPeer;
 let portalScene;
+let userMediaControls;
 
 let peers = {};
 
