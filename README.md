@@ -9,7 +9,7 @@ This guide assumes some familiarity with your the command line (a text-based int
 ```sh
 # download this repository and change directory (cd) into the root folder
 git clone https://github.com/AidanNelson/itp-ima-hybrid-experiences.git
-cd virtual-venue
+cd itp-ima-hybrid-experiences
 
 # install all dependencies on the front end
 npm install
