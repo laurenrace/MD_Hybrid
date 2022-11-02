@@ -8,8 +8,8 @@ This guide assumes some familiarity with your the command line (a text-based int
 
 ```sh
 # download this repository and change directory (cd) into the root folder
-git clone https://github.com/AidanNelson/virtual-venue.git
-cd virtual-venue
+git clone https://github.com/AidanNelson/itp-ima-hybrid-experiences.git
+cd itp-ima-hybrid-experiences
 
 # install all dependencies on the front end
 npm install
@@ -32,6 +32,7 @@ npm install
 # create certificates for local development (only required once)
 # this will automatically set the country code to US.  Feel free to change if you like
 # you may be able to ignore all other parameters
+mkdir certs
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US" -keyout certs/key.pem -out certs/cert.pem
 
 # once everything has been installed, start the server from the root of the repository
