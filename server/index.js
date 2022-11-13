@@ -1,7 +1,7 @@
 // HTTP Server setup:
 // https://stackoverflow.com/questions/27393705/how-to-resolve-a-socket-io-404-not-found-error
 const express = require("express");
-// const https = require("https");
+const https = require("https");
 const http = require("http");
 const Datastore = require("nedb");
 const MediasoupManager = require("simple-mediasoup-peer-server");
@@ -11,6 +11,9 @@ let clients = {};
 let adminMessage = "";
 let sceneId = 1; // start at no scene
 let shouldShowChat = false;
+let getTs = () => Math.floor(Date.now() / 1000);
+let moterStartTs = 0;
+
 
 async function main() {
   const app = express();
@@ -141,16 +144,50 @@ async function main() {
     io.sockets.emit("userPositions", clients);
   }, 200);
 
+  // weather api request
+  // setInterval(() => {
+  //   // console.log("asdf");
+  //   // https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=f8052d38855c0be65ee1e2feabfd82f1
+  //   const https = require('https')
+  //   const url = "https://jsonmock.hackerrank.com/api/movies";
+  // https.get(url, res => {
+  //   let data = '';
+  //   res.on('data', chunk => {
+  //     data += chunk;
+  //   });
+  //   res.on('end', () => {
+  //     data = JSON.parse(data);
+  //     console.log(data);
+  //   })
+  // }).on('error', err => {
+  //   console.log(err.message);
+  // })
+
+  //   //   fetch('http://example.com/movies.json')
+  //   //   .then((response) => response.json())
+  //   //   .then((data) => console.log(data));
+  // }, 1000);
+
   // every X seconds, check for inactive clients and send them into cyberspace
-  setInterval(() => {
-    let now = Date.now();
-    for (let id in clients) {
-      if (now - clients[id].lastSeenTs > 120000) {
-        console.log("Culling inactive user with id", id);
-        clients[id].position[1] = -5; // send them underground
-      }
-    }
-  }, 10000);
+  // setInterval(() => {
+  //   let now = Date.now();
+  //   for (let id in clients) {
+  //     if (now - clients[id].lastSeenTs > 120000) {
+  //       console.log("Culling inactive user with id", id);
+  //       clients[id].position[1] = -5; // send them underground
+  //     }
+  //   }
+  // }, 10000);
+
+  app.post('/motor', (req, res) => {
+    console.log("recv start motor post");
+    moterStartTs = getTs();
+  });
+
+  app.get('/motor', (req, res) => {
+    if (getTs() - moterStartTs < 3) res.send("true");
+    else res.send("false");
+  });
 
   new MediasoupManager(io);
 }

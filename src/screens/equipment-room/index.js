@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import { SimpleMediasoupPeer } from "simple-mediasoup-peer-client";
+var request = require('request');
 
 let socket;
 let mediasoupPeer;
@@ -222,8 +223,9 @@ function gotDevices(deviceInfos) {
 function gotStream(stream) {
   localCam = stream; // make stream available to console
 
-  cameraPaused = false;
-  micPaused = false;
+  // cameraPaused = false;
+  // micPaused = false;
+  if (cameraPaused) pauseVideo();
   updateCameraPausedButton();
   updateMicPausedButton();
 
@@ -339,3 +341,80 @@ function resumeMic() {
 
   updateMicPausedButton();
 }
+
+
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+// speech recognition & transcription
+
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+
+var recognition = new SpeechRecognition();
+let started = false;
+recognition.continuous = true;
+recognition.lang = 'en-US';
+recognition.interimResults = false;
+recognition.maxAlternatives = 1;
+
+let transcriptElement = document.getElementById("transcript");
+
+window.onbeforeunload = function () {
+  recognition.stop();
+  console.log("stop recording");
+  return undefined;
+};
+
+document.body.onclick = function () {
+  if (started) return;
+  started = true;
+  recognition.start();
+  console.log("start recording");
+}
+
+recognition.onresult = function (event) {
+  res = event.results[event.results.length - 1];
+  console.log(res[0].confidence, res[0].transcript);
+  transcriptElement.textContent = ": " + res[0].transcript;
+}
+
+
+recognition.onnomatch = function (event) {
+  transcriptElement.textContent = "I didn't recognise.";
+}
+
+recognition.onerror = function (event) {
+  transcriptElement.textContent = 'Error occurred in recognition: ' + event.error;
+}
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+// ask for help, doorbell, knock desk
+const doorbellSound = document.getElementById("doorbellSound");
+const doorbellButton = document.getElementById("doorbellButton");
+const knockButton = document.getElementById("knockButton");
+doorbellButton.addEventListener("click", () => {
+  doorbellSound.play();
+
+});
+
+knockButton.addEventListener("click", () => {
+  request.post(
+    'http://localhost:65156/motor',
+    {},
+    function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log(body);
+      }
+    }
+  );
+
+})
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+// chat box
+const chatContent = document.getElementById("chatContent");
+const chatHistory = document.getElementById("chatHistory");
+const chatSend = document.getElementById("chatSend");
+chatSend.addEventListener("click", () => {
+  chatHistory.innerHTML = ": " + chatContent.value;
+});
