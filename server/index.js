@@ -36,7 +36,8 @@ async function main() {
   }); //creates a new one if needed
   db.loadDatabase(); //loads the db with the data
 
-  let io = require("socket.io")();
+  let io = require("socket.io")(server);
+
   io.listen(server, {
     cors: {
       origin: "*",

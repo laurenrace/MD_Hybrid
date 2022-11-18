@@ -23,8 +23,14 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
-  socket = io("https://localhost");
+  socket = io('http://localhost:65156/');
+  console.log("asdf", socket);
 
+
+  mediasoupPeer = new SimpleMediasoupPeer(socket);
+  mediasoupPeer.on("track", gotTrack);
+
+  
   socket.on("clients", (ids) => {
     console.log("Got initial clients!");
     for (const id of ids) {
@@ -35,16 +41,17 @@ function init() {
       }
     }
   });
-
+  
   socket.on("clientConnected", (id) => {
     console.log("Client conencted: ", id);
     peers[id] = {};
     mediasoupPeer.connectToPeer(id);
   });
-
+  
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
     delete peers[id];
+    document.getElementById(id + "_video").remove();
   });
 
   cameraPausedButton.addEventListener("click", () => {
@@ -62,9 +69,6 @@ function init() {
       pauseMic();
     }
   });
-
-  mediasoupPeer = new SimpleMediasoupPeer(socket);
-  mediasoupPeer.on("track", gotTrack);
 
   initialize();
 }
@@ -129,13 +133,14 @@ function gotTrack(track, id, label) {
     if (el == null) {
       console.log("Creating video element for client with ID: " + id);
       el = document.createElement("video");
+      el.className = "peerVideo"
       el.id = id + "_video";
       el.autoplay = true;
       el.muted = true;
       el.setAttribute("playsinline", true);
 
-      // el.style = "visibility: hidden;";
-      document.body.appendChild(el);
+      // el.style = "visibility: hidden;";      
+      document.getElementById("peersVideos").appendChild(el);
     }
   }
 
@@ -147,7 +152,7 @@ function gotTrack(track, id, label) {
       document.body.appendChild(el);
       el.setAttribute("playsinline", true);
       el.setAttribute("autoplay", true);
-      el.volume = 0;
+      // el.volume = 100;
     }
   }
 
@@ -394,7 +399,6 @@ const doorbellButton = document.getElementById("doorbellButton");
 const knockButton = document.getElementById("knockButton");
 doorbellButton.addEventListener("click", () => {
   doorbellSound.play();
-
 });
 
 knockButton.addEventListener("click", () => {
