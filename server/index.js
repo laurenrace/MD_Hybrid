@@ -27,7 +27,7 @@ async function main() {
   app.use(express.static(process.cwd() + "/dist"));
 
   const port = 3095;
-  server.listen(port);
+  
   console.log(`Server listening on port ${port}`);
 
   let db = new Datastore({
@@ -38,13 +38,14 @@ async function main() {
 
   let io = require("socket.io")(server);
 
-  io.listen(server, {
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"],
-      credentials: true,
-    },
-  });
+  // io.listen(server, {
+  //   cors: {
+  //     origin: "*",
+  //     methods: ["GET", "POST"],
+  //     credentials: true,
+  //   },
+  // });
+  server.listen(port);
 
   io.on("connection", (socket) => {
     console.log(
