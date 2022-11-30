@@ -27,7 +27,7 @@ function init() {
   socket = io('https://yorb.itp.io/', {path: '/hybrid/socket.io'});
 
   // for local development
-  // socket = io('http://localhost:65156/');
+  // socket = io('http://localhost:55555/');
 
 
   mediasoupPeer = new SimpleMediasoupPeer(socket);
