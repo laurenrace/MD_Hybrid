@@ -142,8 +142,12 @@ function gotTrack(track, id, label) {
       el.muted = true;
       el.setAttribute("playsinline", true);
 
+      const parentEl = document.createElement("div");
+      parentEl.className = "col";
+      parentEl.appendChild(el);
+
       // el.style = "visibility: hidden;";
-      document.getElementById("peersVideos").appendChild(el);
+      document.getElementById("peersVideos").appendChild(parentEl);
     }
   }
 
