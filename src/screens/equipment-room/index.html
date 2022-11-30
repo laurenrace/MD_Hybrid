@@ -49,90 +49,91 @@
 </head>
 
 <body>
-  <div class="row border p-1" id="lobby-controls">
-    <!-- ROOM NAME -->
-    <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">EQUIPMENT ROOM SCREEN</h5>
+  <div class="container-fluid">
+    <div class="row border p-1" id="lobby-controls">
+      <!-- ROOM NAME -->
+      <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">EQUIPMENT ROOM SCREEN</h5>
 
-    <div class="row justify-content-left">
+      <div class="row justify-content-left">
 
-      <!-- LOCAL VIDEO -->
-      <!-- select peer's video, local video scales down size, float on peer's video-->
-      <div class="col">
-        <video id="local_video" autoplay playsinline muted></video>
+        <!-- LOCAL VIDEO -->
+        <!-- select peer's video, local video scales down size, float on peer's video-->
+        <div class="col">
+          <video id="local_video" autoplay playsinline muted></video>
+        </div>
+
+        <!-- INFO BOARD -->
+        <div class="col infoCard">
+          <p><b><i>◯ Equipment Room Hours</i></b><br>
+            Mon-Sun —— 9:30 AM - 7:00 PM</p>
+
+          <p><b><i>◯ Notification</i></b><br>
+            ER will close at 1:00 PM today!</p>
+
+          <p><b><i>◯ Upcoming Events</i></b><br>
+            <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
+              Talks</a>
+            —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
+            <br>
+            <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
+              Talks</a>
+            —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
+            <br>
+            <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
+              Talks</a>
+            —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
+            <br>
+            <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
+              Talks</a>
+            —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
+            <br>
+            <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
+              Talks</a>
+            —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
+          </p>
+        </div>
       </div>
 
-      <!-- INFO BOARD -->
-      <div class="col infoCard">
-        <p><b><i>◯ Equipment Room Hours</i></b><br>
-          Mon-Sun —— 9:30 AM - 7:00 PM</p>
+      <!-- LOBBY CONTROLS -->
+      <div class="row align-self-center">
+        <div class="select">
+          <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive">
+              CAMERA ON
+            </button></label><select id="videoSource"></select>
+        </div>
+      </div>
 
-        <p><b><i>◯ Notification</i></b><br>
-          ER will close at 1:00 PM today!</p>
+      <div class="row align-self-center">
+        <div class="select">
+          <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive">
+              MIC ON
+            </button></label><select id="audioSource"></select>
+        </div>
+      </div>
 
-        <p><b><i>◯ Upcoming Events</i></b><br>
-          <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
-            Talks</a>
-          —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
-          <br>
-          <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
-            Talks</a>
-          —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
-          <br>
-          <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
-            Talks</a>
-          —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
-          <br>
-          <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
-            Talks</a>
-          —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
-          <br>
-          <a href="https://tisch.nyu.edu/itp/events/fall-2022/itp-ima-thursday-night-talk-cwt">Thursday Night
-            Talks</a>
-          —— 11/10, 6:30 PM - 7:30 PM EST, 370 Jay Street, 4th Floor, Brooklyn, NY, 11201
-        </p>
+      <div class="col align-self-center" style="display: none">
+        <div class="select">
+          <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+        </div>
       </div>
     </div>
 
-    <!-- LOBBY CONTROLS -->
-    <div class="row align-self-center">
-      <div class="select">
-        <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive">
-            CAMERA ON
-          </button></label><select id="videoSource"></select>
+    <!-- VIDEO TRANSCRIPTION -->
+    <div class="row justify-content-center border p-1">
+      <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">TRANSCRIPTION</h5>
+      <div class="transcriptionArea" id="transcript"
+        style="text-align: left; font-size: 20px; height: 40px; font-family: Comic Sans MS, Comic Sans, cursive; text-transform: uppercase;">
+        ...
       </div>
     </div>
 
-    <div class="row align-self-center">
-      <div class="select">
-        <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive">
-            MIC ON
-          </button></label><select id="audioSource"></select>
-      </div>
-    </div>
-
-    <div class="col align-self-center" style="display: none">
-      <div class="select">
-        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIDEO TRANSCRIPTION -->
-  <div class="row justify-content-center border p-1">
-    <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">TRANSCRIPTION</h5>
-    <div class="transcriptionArea" id="transcript"
-      style="text-align: left; font-size: 20px; height: 40px; font-family: Comic Sans MS, Comic Sans, cursive; text-transform: uppercase;">
-      ...
-    </div>
-  </div>
-
-  <!-- PEERS' VIDEOES -->
-  <div class="row justify-content-center border p-1">
-    <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">PEERS VIDEOES</h5>
-    <div class="col" id="peersVideos">
-      <!-- <iframe src="http://localhost:1234/equipment-room"></iframe> -->
-      <!-- <video autoplay playsinline muted></video> -->
-      <!-- <svg width=Window.innerWidth height="180">
+    <!-- PEERS' VIDEOES -->
+    <div class="row justify-content-center border p-1" >
+      <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">PEERS VIDEOES</h5>
+      <div class="col" id="peersVideos">
+        <!-- <iframe src="http://localhost:1234/equipment-room"></iframe> -->
+        <!-- <video autoplay playsinline muted></video> -->
+        <!-- <svg width=Window.innerWidth height="180">
         <rect x="0" y="0" width="240" height="180" style="fill:rgb(156, 156, 156);stroke-width:10; stroke:rgb(0, 255, 17)" />
         <rect x="250" y="0" width="240" height="180" style="fill:rgb(156, 156, 156);stroke-width:3;stroke:rgb(0,0,0)" />
         <rect x="500" y="0" width="240" height="180" style="fill:rgb(156, 156, 156);stroke-width:3;stroke:rgb(0,0,0)" />
@@ -140,38 +141,41 @@
         <rect x="1000" y="0" width="240" height="180"
           style="fill:rgb(156, 156, 156);stroke-width:3;stroke:rgb(0,0,0)" />
       </svg> -->
+      </div>
     </div>
-  </div>
 
-  <!-- CHAT BOX -->
-  <div class="row justify-content-center border p-1">
-    <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">CHAT BOX</h5>
-    <div class="col" style="height: 120px;">
-      <input id="chatContent" type="text">
-      <input id="chatSend" type="submit" value="SEND">
+    <!-- CHAT BOX -->
+    <div class="row justify-content-center border p-1">
+      <h5 style="color:rgb(255, 255, 255); background-color: rgb(90, 65, 255);">CHAT BOX</h5>
+      <div class="col" style="height: 120px;">
+        <input id="chatContent" type="text">
+        <input id="chatSend" type="submit" value="SEND">
+      </div>
+      <div class="col" style="height: 120px;">
+        <p id="chatHistory"></p>
+      </div>
     </div>
-    <div class="col" style="height: 120px;">
-      <p id="chatHistory"></p>
-    </div>
-  </div>
 
-  <!-- ASK FOR HELP -->
-  <div class="row justify-content-center border p-1" style="position: absolute; left: 0px;right: 0px; bottom: 0; ">
-    <h5 style="color:white; background-color: rgb(255, 60, 0);">ASK FOR HELP</h5>
-    <div class="col">
-      <!-- DOORBELL -->
-      <p><b><i>◯ Urgent, no one is around?</i></b><br>
-        <audio id="doorbellSound">
-          <source src="../../assets/doorbell.mp3" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-        <button id="doorbellButton"> RING THE DOORBELL 🔔</button>
-    </div>
-    <div class="col">
-      <!-- KNOCK ON DESK -->
-      <p><b><i>◯ Just get help from ER?</i></b><br>
-        <button id="knockButton"> KNOCK ON ER DESK 🧑🏻‍💻</button>
-    </div>
+    <!-- ASK FOR HELP -->
+   
+      <div class="row justify-content-center border p-1">
+        <h5 style="color:white; background-color: rgb(255, 60, 0);">ASK FOR HELP</h5>
+        <div class="col">
+          <!-- DOORBELL -->
+          <p><b><i>◯ Urgent, no one is around?</i></b><br>
+            <audio id="doorbellSound">
+              <source src="../../assets/doorbell.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+            <button id="doorbellButton"> RING THE DOORBELL 🔔</button>
+        </div>
+        <div class="col">
+          <!-- KNOCK ON DESK -->
+          <p><b><i>◯ Just get help from ER?</i></b><br>
+            <button id="knockButton"> KNOCK ON ER DESK 🧑🏻‍💻</button>
+        </div>
+      </div>
+
   </div>
 
 
