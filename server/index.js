@@ -26,7 +26,7 @@ async function main() {
   console.log("Serving static files at ", distFolder);
   app.use(express.static(process.cwd() + "/dist"));
 
-  const port = 55555;
+  const port = 3095;
   server.listen(port);
   console.log(`Server listening on port ${port}`);
 
