@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Repo for Virtual Venue",
   "scripts": {
-    "build": "parcel build src/index.html src/screens/equipment-room/index.html src/equipment-room/index.html --public-url ./",
+    "build": "parcel build src/index.html src/screens/equipment-room/index.html src/equipment-room/index.html --public-url /hybrid/",
     "watch": "export ENVIRONMENT=dev && parcel src/index.html src/screens/equipment-room/index.html src/equipment-room/index.html",
     "start-server": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "production": "parcel build src/index.html src/screens/equipment-room/index.html src/equipment-room/index.html --public-url ./ && forever start server/index.js"
+    "production": "parcel build src/index.html src/screens/equipment-room/index.html src/equipment-room/index.html --public-url /hybrid/ && forever start server/index.js"
   },
   "repository": {
     "type": "git",
