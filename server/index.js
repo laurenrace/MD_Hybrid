@@ -7,6 +7,7 @@ const Datastore = require("nedb");
 const MediasoupManager = require("simple-mediasoup-peer-server");
 const devcert = require("devcert");
 
+
 let clients = {};
 let adminMessage = "";
 let sceneId = 1; // start at no scene
@@ -36,7 +37,12 @@ async function main() {
   }); //creates a new one if needed
   db.loadDatabase(); //loads the db with the data
 
-  let io = require("socket.io")(server);
+  let io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
 
   // io.listen(server, {
   //   cors: {
