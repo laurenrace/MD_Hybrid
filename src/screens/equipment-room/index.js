@@ -23,8 +23,11 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
-  socket = io('http://localhost:65156/');
-  console.log("asdf", socket);
+  // for production
+  socket = io('https://yorb.itp.io/', {path: '/hybrid/socket.io'});
+
+  // for local development
+  // socket = io('http://localhost:65156/');
 
 
   mediasoupPeer = new SimpleMediasoupPeer(socket);
