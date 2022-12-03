@@ -23,14 +23,12 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
-  socket = io('http://localhost:65156/');
-  console.log("asdf", socket);
-
+  socket = io(`https://${window.location.hostname}:65156`);
 
   mediasoupPeer = new SimpleMediasoupPeer(socket);
   mediasoupPeer.on("track", gotTrack);
 
-  
+
   socket.on("clients", (ids) => {
     console.log("Got initial clients!");
     for (const id of ids) {
@@ -41,13 +39,13 @@ function init() {
       }
     }
   });
-  
+
   socket.on("clientConnected", (id) => {
     console.log("Client conencted: ", id);
     peers[id] = {};
     mediasoupPeer.connectToPeer(id);
   });
-  
+
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
     delete peers[id];
@@ -107,6 +105,7 @@ async function initializeCameraAccess() {
 }
 
 function initialize() {
+  console.log("initialize", hasInitializedCameraAccess);
   if (!hasInitializedCameraAccess) {
     initializeCameraAccess();
   }
@@ -133,10 +132,11 @@ function gotTrack(track, id, label) {
     if (el == null) {
       console.log("Creating video element for client with ID: " + id);
       el = document.createElement("video");
-      el.className = "peerVideo"
+      el.className = "peerVideo";
       el.id = id + "_video";
       el.autoplay = true;
       el.muted = true;
+      el.height = 180;
       el.setAttribute("playsinline", true);
 
       // el.style = "visibility: hidden;";      
@@ -306,6 +306,7 @@ async function startStream() {
       height: { ideal: 240 },
     },
   };
+  console.log("constraints", constraints);
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then(gotStream)
@@ -403,7 +404,7 @@ doorbellButton.addEventListener("click", () => {
 
 knockButton.addEventListener("click", () => {
   request.post(
-    'http://localhost:65156/motor',
+    `http://${window.location.hostname}:65156/motor`,
     {},
     function (error, response, body) {
       if (!error && response.statusCode == 200) {
