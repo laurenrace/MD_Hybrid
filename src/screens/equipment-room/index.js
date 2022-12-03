@@ -306,7 +306,6 @@ async function startStream() {
       height: { ideal: 240 },
     },
   };
-  console.log("constraints", constraints);
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then(gotStream)

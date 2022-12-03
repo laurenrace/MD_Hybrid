@@ -177,11 +177,31 @@ class PortalScene {
     this.addLights();
     this.addStencil();
     this.addPortalSides();
-    const video = document.getElementById("testVideo");
-    video.play();
-    this.addEquirectangularVideo(video);
+    this.get360video();
+      
+    // const video = document.getElementById("testVideo");
+    // video.play();
+    // this.addEquirectangularVideo(video);
 
     this.loop();
+  }
+  async get360video() {
+    await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    const devicesInfos = await navigator.mediaDevices.enumerateDevices();
+    console.log("devicesInfos", devicesInfos);
+    const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label == "默认 - MacBook Pro扬声器 (Built-in)");
+    const constraints = {
+      video: {
+        deviceId: { exact: cam.deviceId },
+      },
+    };
+    const media = await navigator.mediaDevices.getUserMedia(constraints);
+    const track = media.getVideoTracks()[0];
+    const stream = new MediaStream([track]);
+    const ele = document.createElement("video");
+    ele.srcObject = stream;
+    ele.play();
+    this.addEquirectangularVideo(ele);
   }
 
   addWebcamVideo(videoEl) {
@@ -252,6 +272,7 @@ class PortalScene {
   }
 
   addEquirectangularVideo(videoEl) {
+    console.log("videoEl", videoEl);
     const geometry = new THREE.SphereGeometry(100, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
