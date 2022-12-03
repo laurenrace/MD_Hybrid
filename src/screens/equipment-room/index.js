@@ -237,6 +237,8 @@ function gotStream(stream) {
   const videoTrack = localCam.getVideoTracks()[0];
   const audioTrack = localCam.getAudioTracks()[0];
 
+  console.log("localCam", localCam);
+
   let videoStream = new MediaStream([videoTrack]);
   if ("srcObject" in videoElement) {
     videoElement.srcObject = videoStream;
@@ -246,7 +248,9 @@ function gotStream(stream) {
 
   videoElement.play();
 
-  mediasoupPeer.addTrack(videoTrack, "video");
+  const queryString = window.location.search;
+
+  mediasoupPeer.addTrack(videoTrack, queryString != "?360" ? "video" : "360");
   mediasoupPeer.addTrack(audioTrack, "audio");
 
   // Refresh button list in case labels have become available
@@ -298,7 +302,6 @@ async function startStream() {
 
   const audioSource = audioInputSelect.value;
   const videoSource = videoInputSelect.value;
-  console.log("videoInputSelect.value", videoInputSelect.value);
   const constraints = {
     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
     video: {

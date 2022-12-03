@@ -69,13 +69,13 @@ function gotTrack(track, id, label) {
       el.autoplay = true;
       el.muted = true;
       el.setAttribute("playsinline", true);
-
-      // el.style = "visibility: hidden;";
       document.body.appendChild(el);
-      portalScene.addWebcamVideo(el);
+      if (label == "360")
+        portalScene.addEquirectangularVideo(el);
+      else
+        portalScene.addWebcamVideo(el);
     }
   }
-
   if (track.kind === "audio") {
     if (el == null) {
       console.log("Creating audio element for client with ID: " + id);
@@ -177,48 +177,44 @@ class PortalScene {
     this.addLights();
     this.addStencil();
     this.addPortalSides();
-    this.get360video().then(this.loop());
+    // this.get360video().then(this.loop());
 
     // const video = document.getElementById("testVideo");
     // video.play();
     // this.addEquirectangularVideo(video);
 
-    // this.loop();
+    this.loop();
 
   }
-  async get360video() {
-    await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-    const devicesInfos = await navigator.mediaDevices.enumerateDevices();
-    console.log("devicesInfos", devicesInfos);
-    // RICOH THETA S (05ca:2711)
-    // FaceTime 高清摄像头（内建） (05ac:8514)
-    // const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label == "RICOH THETA S (05ca:2711)");
-    const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label.includes("FaceTime"));
-    console.log("cam", cam);
+  // async get360video() {
+  //   await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+  //   const devicesInfos = await navigator.mediaDevices.enumerateDevices();
+  //   console.log("devicesInfos", devicesInfos);
+  //   // RICOH THETA S (05ca:2711)
+  //   // FaceTime 高清摄像头（内建） (05ac:8514)
+  //   // const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label == "RICOH THETA S (05ca:2711)");
+  //   const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label.includes("FaceTime"));
+  //   console.log("cam", cam);
 
-    const constraints = {
-      audio: { deviceId: undefined },
-      video: { deviceId: { exact: cam.deviceId } },
-    };
-    const media = await navigator.mediaDevices.getUserMedia(constraints);
-    console.log("media", media);
-    const track = media.getVideoTracks()[0];
-    const stream = new MediaStream([track]);
-    const ele = document.createElement("video");
-    ele.srcObject = stream;
-    ele.muted = true;
-    ele.setAttribute("playsinline", true);
-    ele.setAttribute("autoplay", true);
+  //   const constraints = {
+  //     audio: { deviceId: undefined },
+  //     video: { deviceId: { exact: cam.deviceId } },
+  //   };
+  //   const media = await navigator.mediaDevices.getUserMedia(constraints);
+  //   const track = media.getVideoTracks()[0];
+  //   const stream = new MediaStream([track]);
+  //   const ele = document.createElement("video");
+  //   ele.srcObject = stream;
+  //   ele.muted = true;
+  //   ele.setAttribute("playsinline", true);
+  //   ele.setAttribute("autoplay", true);
 
-    // const ele = document.getElementById("testVideo");
-    ele.play();
-    await this.addEquirectangularVideo(ele);
-  }
+  //   // const ele = document.getElementById("testVideo");
+  //   ele.play();
+  //   await this.addEquirectangularVideo(ele);
+  // }
 
   addWebcamVideo(videoEl) {
-    this.addEquirectangularVideo(videoEl);
-    return;
-    
     console.log('adding webcam video', videoEl);
     const geometry = new THREE.PlaneGeometry(4, 4);
     // invert the geometry on the x-axis so that all of the faces point inward
