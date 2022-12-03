@@ -253,7 +253,7 @@ function gotStream(stream) {
 
   videoElement.play();
 
-  mediasoupPeer.addTrack(videoTrack, "video");
+  mediasoupPeer.addTrack(videoTrack, "360");
   mediasoupPeer.addTrack(audioTrack, "audio");
 
   // Refresh button list in case labels have become available
