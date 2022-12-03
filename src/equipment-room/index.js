@@ -178,7 +178,7 @@ class PortalScene {
     this.addStencil();
     this.addPortalSides();
     this.get360video();
-      
+
     // const video = document.getElementById("testVideo");
     // video.play();
     // this.addEquirectangularVideo(video);
@@ -189,17 +189,26 @@ class PortalScene {
     await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
     const devicesInfos = await navigator.mediaDevices.enumerateDevices();
     console.log("devicesInfos", devicesInfos);
-    const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label == "默认 - MacBook Pro扬声器 (Built-in)");
+    // RICOH THETA S (05ca:2711)
+    // FaceTime高清摄像头（内建） (05ac:8514)
+    // const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label == "RICOH THETA S (05ca:2711)");
+    const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label.includes("FaceTime"));
+
+    console.log("cam", cam);
     const constraints = {
-      video: {
-        deviceId: { exact: cam.deviceId },
-      },
+      audio: { deviceId: undefined },
+      video: { deviceId: { exact: cam.deviceId } },
     };
     const media = await navigator.mediaDevices.getUserMedia(constraints);
     const track = media.getVideoTracks()[0];
     const stream = new MediaStream([track]);
     const ele = document.createElement("video");
     ele.srcObject = stream;
+    ele.muted = true;
+    ele.setAttribute("playsinline", true);
+    ele.setAttribute("autoplay", true);
+
+    // const ele = document.getElementById("testVideo");
     ele.play();
     this.addEquirectangularVideo(ele);
   }

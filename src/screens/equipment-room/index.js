@@ -298,6 +298,7 @@ async function startStream() {
 
   const audioSource = audioInputSelect.value;
   const videoSource = videoInputSelect.value;
+  console.log("videoInputSelect.value", videoInputSelect.value);
   const constraints = {
     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
     video: {
