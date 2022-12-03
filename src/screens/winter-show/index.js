@@ -254,8 +254,10 @@ function gotStream(stream) {
 
   videoElement.play();
 
-  mediasoupPeer.addTrack(videoTrack, "360");
-  mediasoupPeer.addTrack(audioTrack, "audio");
+  setTimeout(() => {
+    mediasoupPeer.addTrack(videoTrack, "360");
+    mediasoupPeer.addTrack(audioTrack, "audio");
+  }, 2500); // add delay here because mediasoupPeer takes a few seconds to set up
 
   // Refresh button list in case labels have become available
   return navigator.mediaDevices.enumerateDevices();
