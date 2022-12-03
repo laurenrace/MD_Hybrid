@@ -7,7 +7,6 @@ const Datastore = require("nedb");
 const MediasoupManager = require("simple-mediasoup-peer-server");
 const devcert = require("devcert");
 
-
 let clients = {};
 let adminMessage = "";
 let sceneId = 1; // start at no scene
@@ -15,20 +14,23 @@ let shouldShowChat = false;
 let getTs = () => Math.floor(Date.now() / 1000);
 let moterStartTs = 0;
 
-
 async function main() {
   const app = express();
-
-  // const ssl = await devcert.certificateFor("localhost");
-  // const server = https.createServer(ssl, app);
-  const server = http.createServer(app);
-
+  let server;
+  let port;
+  if (process.env.ENVIRONMENT === "dev") {
+    console.log("creating certs for local development");
+    port = 443;
+    const ssl = await devcert.certificateFor("localhost");
+    server = https.createServer(ssl, app);
+  } else {
+    port = 3095;
+    server = http.createServer(app);
+  }
   const distFolder = process.cwd() + "/dist";
   console.log("Serving static files at ", distFolder);
   app.use(express.static(process.cwd() + "/dist"));
 
-  const port = 3095;
-  
   console.log(`Server listening on port ${port}`);
 
   let db = new Datastore({
@@ -40,8 +42,8 @@ async function main() {
   let io = require("socket.io")(server, {
     cors: {
       origin: "*",
-      methods: ["GET", "POST"]
-    }
+      methods: ["GET", "POST"],
+    },
   });
 
   // io.listen(server, {
@@ -56,10 +58,10 @@ async function main() {
   io.on("connection", (socket) => {
     console.log(
       "User " +
-      socket.id +
-      " connected, there are " +
-      io.engine.clientsCount +
-      " clients connected"
+        socket.id +
+        " connected, there are " +
+        io.engine.clientsCount +
+        " clients connected"
     );
 
     // send chat
@@ -187,12 +189,12 @@ async function main() {
   //   }
   // }, 10000);
 
-  app.post('/motor', (req, res) => {
+  app.post("/motor", (req, res) => {
     console.log("recv start motor post");
     moterStartTs = getTs();
   });
 
-  app.get('/motor', (req, res) => {
+  app.get("/motor", (req, res) => {
     if (getTs() - moterStartTs < 3) res.send("true");
     else res.send("false");
   });

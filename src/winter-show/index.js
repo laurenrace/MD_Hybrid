@@ -32,7 +32,9 @@ function init() {
 
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
-    socket = io("http://localhost:3095/");
+    // console.log();
+    let host = window.location.hostname;
+    socket = io("https://" + host + "/");
   } else {
     // for production
     socket = io("https://yorb.itp.io/", { path: "/hybrid/socket.io" });
