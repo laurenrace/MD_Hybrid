@@ -312,8 +312,8 @@ async function startStream() {
     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
-      width: { ideal: 320 },
-      height: { ideal: 240 },
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
     },
   };
   navigator.mediaDevices

@@ -162,7 +162,9 @@ function gotTrack(track, id, label) {
       // el.style = "visibility: hidden;";
       document.getElementById("peersVideos").appendChild(parentEl);
 
-      threejsScene.addEquirectangularVideo(el);
+      if (label === "360") {
+        threejsScene.addEquirectangularVideo(el);
+      }
     }
   }
 
@@ -386,12 +388,12 @@ class PortalScene {
     this.portalHeight = this.portalWidth / this.aspect;
 
     this.camera = new THREE.PerspectiveCamera(
-      50,
+      75,
       this.width / this.height,
       0.1,
       5000
     );
-    this.camera.position.set(0, 0, 5);
+    this.camera.position.set(0, 0, 0.1);
 
     this.mouse = new THREE.Vector2();
 
@@ -510,7 +512,11 @@ class PortalScene {
   }
 
   addEquirectangularVideo(videoEl) {
-    const geometry = new THREE.SphereGeometry(100, 60, 40);
+    if (this.videoMesh360) {
+      console.log("removing old background");
+      this.scene.remove(this.videoMesh360);
+    }
+    const geometry = new THREE.SphereGeometry(1000, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
 
@@ -519,6 +525,7 @@ class PortalScene {
 
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
+    this.videoMesh360 = mesh;
     mesh.layers.set(this.BACKGROUND_LAYER);
   }
 
