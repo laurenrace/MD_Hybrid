@@ -32,7 +32,6 @@ function init() {
 
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
-    // console.log();
     let host = window.location.hostname;
     socket = io("https://" + host + "/");
   } else {
