@@ -50,7 +50,9 @@ function init() {
   mediasoupPeer = new SimpleMediasoupPeer(socket);
   mediasoupPeer.on("track", gotTrack);
 
-  userMediaControls = new UserMediaControls(mediasoupPeer);
+  // console.log("window.location", window.location);
+  // if (!window.location.href.includes("screens"))
+  let userMediaControls = new UserMediaControls(mediasoupPeer);
 
   portalScene = new PortalScene();
 }
@@ -186,33 +188,6 @@ class PortalScene {
     this.loop();
 
   }
-  // async get360video() {
-  //   await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-  //   const devicesInfos = await navigator.mediaDevices.enumerateDevices();
-  //   console.log("devicesInfos", devicesInfos);
-  //   // RICOH THETA S (05ca:2711)
-  //   // FaceTime 高清摄像头（内建） (05ac:8514)
-  //   // const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label == "RICOH THETA S (05ca:2711)");
-  //   const cam = devicesInfos.filter(d => d.kind == "videoinput" && d.label.includes("FaceTime"));
-  //   console.log("cam", cam);
-
-  //   const constraints = {
-  //     audio: { deviceId: undefined },
-  //     video: { deviceId: { exact: cam.deviceId } },
-  //   };
-  //   const media = await navigator.mediaDevices.getUserMedia(constraints);
-  //   const track = media.getVideoTracks()[0];
-  //   const stream = new MediaStream([track]);
-  //   const ele = document.createElement("video");
-  //   ele.srcObject = stream;
-  //   ele.muted = true;
-  //   ele.setAttribute("playsinline", true);
-  //   ele.setAttribute("autoplay", true);
-
-  //   // const ele = document.getElementById("testVideo");
-  //   ele.play();
-  //   await this.addEquirectangularVideo(ele);
-  // }
 
   addWebcamVideo(videoEl) {
     console.log('adding webcam video', videoEl);
@@ -282,8 +257,9 @@ class PortalScene {
   }
 
   addEquirectangularVideo(videoEl) {
-    console.log("videoEl", videoEl);
+    console.log("addEquirectangularVideo", videoEl);
     const geometry = new THREE.SphereGeometry(100, 60, 40);
+
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
 

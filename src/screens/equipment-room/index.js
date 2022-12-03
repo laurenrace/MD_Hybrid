@@ -101,6 +101,7 @@ async function initializeCameraAccess() {
   hasInitializedCameraAccess = true;
   // request user media before getting device list or the browser may not prompt user for access
   await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+  console.log("here");
   getDevices();
 }
 
@@ -183,6 +184,7 @@ audioOutputSelect.addEventListener("change", changeAudioDestination);
 
 async function getDevices() {
   let devicesInfo = await navigator.mediaDevices.enumerateDevices();
+  console.log("deviceInfo", devicesInfo);
   gotDevices(devicesInfo);
   await startStream();
 }
@@ -249,8 +251,8 @@ function gotStream(stream) {
   videoElement.play();
 
   const queryString = window.location.search;
-
-  mediasoupPeer.addTrack(videoTrack, queryString != "?360" ? "video" : "360");
+  console.log("qqqq", queryString == "?360" ? "360": "video");
+  mediasoupPeer.addTrack(videoTrack, queryString == "?360" ? "360": "video");
   mediasoupPeer.addTrack(audioTrack, "audio");
 
   // Refresh button list in case labels have become available
