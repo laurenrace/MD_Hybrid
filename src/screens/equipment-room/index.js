@@ -25,7 +25,7 @@ function init() {
 
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
-    socket = io("http://localhost:3095/");
+    socket = io("https://localhost:3095/",  { path: "/socket.io" });
   } else {
     // for production
     socket = io("https://yorb.itp.io/", { path: "/hybrid/socket.io" });

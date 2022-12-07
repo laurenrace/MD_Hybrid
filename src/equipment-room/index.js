@@ -18,8 +18,11 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
-  socket = io("https://yorb.itp.io", {
-    path: "/hybrid/socket.io"
+  // socket = io("https://yorb.itp.io", {
+  //   path: "/hybrid/socket.io"
+  // });
+  socket = io( `https://${window.location.host}:65156`, {
+    path: "/socket.io"
   });
 
   socket.on("clients", (ids) => {

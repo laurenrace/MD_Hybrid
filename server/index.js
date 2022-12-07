@@ -20,7 +20,7 @@ async function main() {
   let port;
   if (process.env.ENVIRONMENT === "dev") {
     console.log("creating certs for local development");
-    port = 443;
+    port = 3095;
     const ssl = await devcert.certificateFor("localhost");
     server = https.createServer(ssl, app);
   } else {
@@ -43,25 +43,20 @@ async function main() {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
-  // io.listen(server, {
-  //   cors: {
-  //     origin: "*",
-  //     methods: ["GET", "POST"],
-  //     credentials: true,
-  //   },
-  // });
+
   server.listen(port);
 
   io.on("connection", (socket) => {
     console.log(
       "User " +
-        socket.id +
-        " connected, there are " +
-        io.engine.clientsCount +
-        " clients connected"
+      socket.id +
+      " connected, there are " +
+      io.engine.clientsCount +
+      " clients connected"
     );
 
     // send chat
