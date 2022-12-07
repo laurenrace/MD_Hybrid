@@ -54,6 +54,7 @@ function init() {
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
     delete peers[id];
+    if(Object.keys(peers).length === 0) document.getElementById("peersVideosPlaceHolder").hidden=false;
     document.getElementById(id + "_video").remove();
   });
 
@@ -137,7 +138,6 @@ function gotTrack(track, id, label) {
       console.log("Creating video element for client with ID: " + id);
       el = document.createElement("video");
       el.className = "peerVideo";
-      el.id = id + "_video";
       el.autoplay = true;
       el.muted = true;
       el.setAttribute("playsinline", true);
@@ -145,8 +145,9 @@ function gotTrack(track, id, label) {
       const parentEl = document.createElement("div");
       parentEl.className = "col";
       parentEl.appendChild(el);
+      parentEl.id = id + "_video";
 
-      // el.style = "visibility: hidden;";
+      document.getElementById("peersVideosPlaceHolder").hidden=true;
       document.getElementById("peersVideos").appendChild(parentEl);
     }
   }
