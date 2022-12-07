@@ -25,7 +25,7 @@ function init() {
 
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
-    socket = io("https://localhost:3095/",  { path: "/socket.io" });
+    socket = io("https://localhost:3095/", { path: "/socket.io" });
   } else {
     // for production
     socket = io("https://yorb.itp.io/", { path: "/hybrid/socket.io" });
@@ -54,7 +54,7 @@ function init() {
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
     delete peers[id];
-    if(Object.keys(peers).length === 0) document.getElementById("peersVideosPlaceHolder").hidden=false;
+    if (Object.keys(peers).length === 0) document.getElementById("peersVideosPlaceHolder").hidden = false;
     document.getElementById(id + "_video").remove();
   });
 
@@ -147,7 +147,7 @@ function gotTrack(track, id, label) {
       parentEl.appendChild(el);
       parentEl.id = id + "_video";
 
-      document.getElementById("peersVideosPlaceHolder").hidden=true;
+      document.getElementById("peersVideosPlaceHolder").hidden = true;
       document.getElementById("peersVideos").appendChild(parentEl);
     }
   }
