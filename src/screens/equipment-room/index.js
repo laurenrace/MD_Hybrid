@@ -410,7 +410,7 @@ doorbellButton.addEventListener("click", () => {
 
 knockButton.addEventListener("click", () => {
   request.post(
-    "http://localhost:65156/motor",
+    `https://${window.location.host}:${window.location.port}/motor`,
     {},
     function (error, response, body) {
       if (!error && response.statusCode == 200) {
