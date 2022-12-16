@@ -2,6 +2,7 @@
 // https://stackoverflow.com/questions/27393705/how-to-resolve-a-socket-io-404-not-found-error
 const express = require("express");
 const https = require("https");
+const http = require("http");
 const Datastore = require("nedb");
 const MediasoupManager = require("simple-mediasoup-peer-server");
 const devcert = require("devcert");
@@ -23,6 +24,8 @@ async function main() {
   const distFolder = process.cwd() + "/dist";
   console.log("Serving static files at ", distFolder);
   app.use(express.static(process.cwd() + "/dist"));
+
+  http.createServer(app).listen(55156);
 
   const port = 65156;
   server.listen(port);
@@ -182,10 +185,11 @@ async function main() {
     console.log("recv start motor post");
     moterStartTs = getTs();
   });
-
+  
   app.get('/motor', (req, res) => {
-    if (getTs() - moterStartTs < 3) res.send("true");
+    if (getTs() - moterStartTs < 5) res.send("true");
     else res.send("false");
+    console.log('requesting');
   });
 
   new MediasoupManager(io);

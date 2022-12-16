@@ -409,7 +409,7 @@ doorbellButton.addEventListener("click", () => {
 
 knockButton.addEventListener("click", () => {
   request.post(
-    `http://${window.location.hostname}:65156/motor`,
+    `http://${window.location.host}/motor`,
     {},
     function (error, response, body) {
       if (!error && response.statusCode == 200) {
