@@ -10,8 +10,9 @@
   <style>
     html,
     body {
-      background-color: rgb(77, 154, 255);
+      background-color: rgb(85, 159, 149);
       color: #eee;
+      overflow: hidden;
     }
 
     .infoCard {
@@ -45,6 +46,7 @@
       overflow: scroll;
       overflow-x: hidden;
     }
+
   </style>
 </head>
 
@@ -54,47 +56,47 @@
     <source src="../../../dist/underwater.mp3" type="audio/mpeg">
   </audio>
 
+  <img class="bgImg" src="../../../dist/undersea.png" width="100%" >
+
   <!-- PEERS VIDEOS -->
   <!-- <div class="row" id="peersVideos"></div> -->
 
 
   <!-- LOCAL VIDEO ALL COMPONENTS -->
-  <div id="myVideoPosition" style="width:600px; position: absolute; top:100px;left:300px;">
-    <!-- SELF VIEW & CONTROLS -->
-    <div class="row border">
+  <div id="myVideoPosition" style="width:200px; position: absolute; top:100px;left:300px;">
+    <div class="row">
       <!-- LOCAL VIDEO -->
       <div class="row">
         <!-- select peer's video, local video scales down size, float on peer's video-->
         <div class="col d-flex">
           <video id="local_video" autoplay playsinline muted></video>
         </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- LOBBY CONTROLS -->
+  <div class="col" style="position: absolute;bottom: 10px;">
+    <div class="row">
+      <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive">
+          CAMERA ON
+        </button></label>
+    </div>
+    <div class="row">
+      <div class="col"><select id="videoSource"></select></div>
+    </div>
+    <div class="row">
+      <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive">
+          MIC ON
+        </button></label>
+    </div>
+    <div class="row">
+      <div class="col"><select id="audioSource"></select></div>
+    </div>
 
-
-        <!-- LOBBY CONTROLS -->
-        <div class="col">
-          <div class="row">
-            <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive">
-                CAMERA ON
-              </button></label>
-          </div>
-          <div class="row">
-            <div class="col"><select id="videoSource"></select></div>
-          </div>
-          <div class="row">
-            <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive">
-                MIC ON
-              </button></label>
-          </div>
-          <div class="row">
-            <div class="col"><select id="audioSource"></select></div>
-          </div>
-
-          <div class="col align-self-center" style="display: none">
-            <div class="select">
-              <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
-            </div>
-          </div>
-        </div>
+    <div class="col align-self-center" style="display: none">
+      <div class="select">
+        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
       </div>
     </div>
   </div>

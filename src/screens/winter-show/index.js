@@ -147,7 +147,7 @@ function gotTrack(track, id, label) {
       const parentEl = document.createElement("div");
       // parentEl.className = "col";
       parentEl.setAttribute("id", id);
-      parentEl.setAttribute("style", "border:1px solid #ffffff; position: absolute;");
+      parentEl.setAttribute("style", "border:0px solid #ffffff; position: absolute;");
       parentEl.style.visibility = 'visible';
       parentEl.style.top = (window.innerHeight - 100) * Math.random() + "px";
       parentEl.style.left = (window.innerWidth - 220) * Math.random() + "px";
@@ -391,7 +391,7 @@ function dragElement(elmnt, elementId) {
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
     // fish is caught:
-    console.log("呜呜呜被抓了想哭");
+    console.log("Oooooooh I'm caught by human! I want to cry!");
     fishCaught(elementId);
   }
 
@@ -413,7 +413,7 @@ function dragElement(elmnt, elementId) {
     document.onmouseup = null;
     document.onmousemove = null;
     // fish is free:
-    console.log("我免费啦");
+    console.log("Haha! I'm free now!");
     fishFree(elementId);
   }
 }
