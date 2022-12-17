@@ -2,6 +2,8 @@ import { io } from "socket.io-client";
 import { SimpleMediasoupPeer } from "simple-mediasoup-peer-client";
 var request = require("request");
 
+var intervals = {};
+
 let socket;
 let mediasoupPeer;
 let localCam;
@@ -256,7 +258,7 @@ function gotDevices(deviceInfos) {
 
 function gotStream(stream) {
   localCam = stream; // make stream available to console
-  if(micPaused && localCam.getAudioTracks()[0].enabled) pauseMic();
+  if (micPaused && localCam.getAudioTracks()[0].enabled) pauseMic();
 
   // cameraPaused = false;
   // micPaused = false;
@@ -329,7 +331,7 @@ async function startStream() {
   }
 
   // if(localCam && localCam.getAudioTracks()[0].enabled && micPaused) 
-  
+
 
   const audioSource = audioInputSelect.value;
   const videoSource = videoInputSelect.value;
@@ -351,13 +353,12 @@ async function startStream() {
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
-var interval;
 
 function fishAnimation(elementId) {
-  var parentElElement = document.getElementById(elementId);
+  let parentElElement = document.getElementById(elementId);
   let v = 1;
   let toRight = true;
-  interval = setInterval(function () {
+  intervals[elementId] = setInterval(function () {
     let leftDistance = parseInt(parentElElement.style.left);
     let windowWidth = window.innerWidth;
     if (toRight == true) {
@@ -373,21 +374,27 @@ function fishAnimation(elementId) {
 }
 
 function fishCaught(elementId) {
-  var parentElElement = document.getElementById(elementId);
-  parentElElement.style.transform = 'rotate(-30deg)';
-  clearInterval(interval);
+  let parentElElement = document.getElementById(elementId);
+  clearInterval(intervals[elementId]);
+  intervals[elementId] = setInterval(function () {
+    if (parentElElement.style.transform != 'rotate(-30deg)')
+      parentElElement.style.transform = 'rotate(-30deg)';
+    else
+      parentElElement.style.transform = 'rotate(-20deg)';
+  }, 80);
 }
 
 function fishFree(elementId) {
-  var parentElElement = document.getElementById(elementId);
+  let parentElElement = document.getElementById(elementId);
   parentElElement.style.transform = 'rotate(0deg)';
+  clearInterval(intervals[elementId]);
   fishAnimation(elementId);
 }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
 function dragElement(elmnt, elementId) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   elmnt.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
