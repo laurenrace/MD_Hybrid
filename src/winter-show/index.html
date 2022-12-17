@@ -54,6 +54,30 @@
 
   <body>
     <div
+      id="onboardingContainer"
+      style="
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1000;
+        top: 0px;
+        left: 0px;
+      "
+    >
+      <div
+        class="parent container d-flex justify-content-center align-items-center h-100"
+      >
+        <div
+          class="child vw-50 vh-50 bg-light"
+          style="width: 50vw; height: 50vh; color: black"
+        >
+          SOME TEXT WELCOMING PEOPLE
+          <!-- OUR ONBOARDING TEXT GOES HERE -->
+          <button id="enterButton">ENTER</button>
+        </div>
+      </div>
+    </div>
+    <div
       id="canvasContainer"
       style="
         position: absolute;

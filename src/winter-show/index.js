@@ -29,6 +29,11 @@ window.onload = init;
 function init() {
   console.log("~~~~~~~~~~~~~~~~~");
 
+  let button = document.getElementById("enterButton");
+  button.addEventListener("click", () => {
+    document.getElementById("onboardingContainer").style.display = "none";
+  });
+
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
     // let host = window.location.hostname;
