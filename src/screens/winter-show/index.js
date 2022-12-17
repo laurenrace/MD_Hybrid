@@ -421,6 +421,85 @@ function dragElement(elmnt, elementId) {
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
+var interval;
+
+function fishAnimation(elementId) {
+  var parentElElement = document.getElementById(elementId);
+  let v = 1;
+  let toRight = true;
+  interval = setInterval(function () {
+    let leftDistance = parseInt(parentElElement.style.left);
+    let windowWidth = window.innerWidth;
+    if (toRight == true) {
+      if (leftDistance < windowWidth - 200) {
+        parentElElement.style.left = parentElElement.offsetLeft + v + "px";
+      } else toRight = false;
+    } else {
+      if (leftDistance > 10) {
+        parentElElement.style.left = parentElElement.offsetLeft - v + "px";
+      } else toRight = true;
+    }
+  }, 10);
+}
+
+function fishCaught(elementId) {
+  var parentElElement = document.getElementById(elementId);
+  parentElElement.style.transform = 'rotate(-30deg)';
+  clearInterval(interval);
+}
+
+function fishFree(elementId) {
+  var parentElElement = document.getElementById(elementId);
+  parentElElement.style.transform = 'rotate(0deg)';
+  fishAnimation(elementId);
+}
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+
+function dragElement(elmnt, elementId) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  elmnt.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+    // fish is caught:
+    console.log("呜呜呜被抓了想哭");
+    fishCaught(elementId);
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+    // fish is free:
+    console.log("我免费啦");
+    fishFree(elementId);
+  }
+}
+
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+
 function pauseVideo() {
   if (!localCam) return;
   localCam.getVideoTracks()[0].enabled = false;
