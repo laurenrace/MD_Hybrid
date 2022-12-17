@@ -219,7 +219,7 @@ audioInputSelect.addEventListener("change", startStream);
 videoInputSelect.addEventListener("change", startStream);
 audioOutputSelect.addEventListener("change", changeAudioDestination);
 
-fishAnimation("myVideoPosition");
+// fishAnimation("myVideoPosition");
 // dragElement(document.getElementById("myVideoPosition"), "myVideoPosition");
 
 async function getDevices() {

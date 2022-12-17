@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import { ITPElements } from "../screens/winter-show/ITPElements";
 
 export class Snowglobe {
   constructor() {
@@ -75,6 +76,7 @@ export class Snowglobe {
     console.log(dracoLoader);
 
     this.addSnowglobe();
+    this.elements = new ITPElements(this.scene);
 
     this.gltfLoader = new GLTFLoader();
     this.gltfLoader.setDRACOLoader(dracoLoader);
@@ -266,6 +268,7 @@ export class Snowglobe {
   }
 
   loop() {
+    this.elements.update();
     for (let id in this.snowflakes) {
       this.snowflakes[id].update();
     }

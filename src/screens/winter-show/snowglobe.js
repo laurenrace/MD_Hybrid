@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import { ITPElements } from "./ITPElements";
 
 export class Snowglobe {
   constructor() {
@@ -85,6 +86,7 @@ export class Snowglobe {
     // const video = document.getElementById("testVideo");
     // video.play();
     // this.addEquirectangularVideo(video);
+    this.elements = new ITPElements(this.scene);
 
     this.loop();
   }
@@ -252,6 +254,7 @@ export class Snowglobe {
   }
 
   loop() {
+    this.elements.update();
     for (let id in this.snowflakes) {
       this.snowflakes[id].update();
     }
