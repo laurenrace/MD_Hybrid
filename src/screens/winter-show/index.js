@@ -284,7 +284,8 @@ function gotStream(stream) {
   videoElement.play();
 
   setTimeout(() => {
-    mediasoupPeer.addTrack(videoTrack, "360");
+    let videoEncodings = [{ scaleResolutionDownBy: 1, maxBitrate: 5000000 }];
+    mediasoupPeer.addTrack(videoTrack, "360", videoEncodings);
     mediasoupPeer.addTrack(audioTrack, "audio");
   }, 2500); // add delay here because mediasoupPeer takes a few seconds to set up
 
@@ -343,9 +344,9 @@ async function startStream() {
     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
-      // width: { ideal: 1280 },
-      // height: { ideal: 720 },
-      width: { ideal: 200 },
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      // width: { ideal: 200 },
     },
   };
   navigator.mediaDevices

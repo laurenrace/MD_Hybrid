@@ -1,20 +1,19 @@
 import { io } from "socket.io-client";
 import { SimpleMediasoupPeer } from "simple-mediasoup-peer-client";
 var request = require("request");
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { FlakesTexture } from "three/examples/jsm/textures/FlakesTexture.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { Snowglobe } from "./snowglobe";
+
+let snowglobeScene;
+var intervals = {};
+
+document.getElementById("underwater").volume = 1;
 
 let socket;
 let mediasoupPeer;
 let localCam;
 
 let cameraPaused = false;
-let micPaused = false;
-
-let threejsScene;
+let micPaused = true;
 
 let hasInitializedCameraAccess = false;
 
@@ -32,12 +31,14 @@ function init() {
 
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
-    let host = window.location.hostname;
-    socket = io("https://" + host + "/");
+    // let host = window.location.hostname;
+    // socket = io("https://" + host + "/");
+    socket = io("https://localhost:3095/", { path: "/socket.io" });
   } else {
     // for production
     socket = io("https://yorb.itp.io/", { path: "/hybrid/socket.io" });
   }
+  snowglobeScene = new Snowglobe();
 
   mediasoupPeer = new SimpleMediasoupPeer(socket);
   mediasoupPeer.on("track", gotTrack);
@@ -61,8 +62,10 @@ function init() {
 
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
+    snowglobeScene.removeSnowflake(id);
     delete peers[id];
-    document.getElementById(id + "_video").remove();
+    // document.getElementById(id + "_video").remove();
+    document.getElementById(id).remove();
   });
 
   cameraPausedButton.addEventListener("click", () => {
@@ -80,7 +83,6 @@ function init() {
       pauseMic();
     }
   });
-
   initialize();
 }
 
@@ -121,17 +123,12 @@ function initialize() {
   if (!hasInitializedCameraAccess) {
     initializeCameraAccess();
   }
-  threejsScene = new PortalScene();
 }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
 function gotTrack(track, id, label) {
   console.log(`Got track of kind ${label} from ${id}`);
-
-  if (label === "360") {
-    console.log("got 360 video");
-  }
 
   let isBroadcast = label == "video-broadcast" || label == "audio-broadcast";
 
@@ -149,21 +146,38 @@ function gotTrack(track, id, label) {
     if (el == null) {
       console.log("Creating video element for client with ID: " + id);
       el = document.createElement("video");
-      el.className = "peerVideo";
       el.id = id + "_video";
       el.autoplay = true;
       el.muted = true;
       el.setAttribute("playsinline", true);
 
       const parentEl = document.createElement("div");
-      parentEl.className = "col";
+      // parentEl.className = "col";
+      parentEl.setAttribute("id", id);
+      parentEl.setAttribute(
+        "style",
+        "border:0px solid #ffffff; position: absolute;"
+      );
+      parentEl.style.visibility = "visible";
+      parentEl.style.top = (window.innerHeight - 100) * Math.random() + "px";
+      parentEl.style.left = (window.innerWidth - 220) * Math.random() + "px";
+      parentEl.style.width = 210 + "px";
+      parentEl.style.height = 150 + "px";
+      // console.log("hhhhh",document.getElementsByTagName("video"));
+
       parentEl.appendChild(el);
 
-      // el.style = "visibility: hidden;";
-      document.getElementById("peersVideos").appendChild(parentEl);
-
       if (label === "360") {
-        threejsScene.addEquirectangularVideo(el);
+        snowglobeScene.addITPVideo(el, id);
+      } else {
+        snowglobeScene.addSnowflakeWithVideo(el, id);
+      }
+      // document.getElementById("peersVideos").appendChild(parentEl);
+
+      document.body.appendChild(parentEl);
+      if (document.body.appendChild(parentEl)) {
+        fishAnimation(id);
+        dragElement(document.getElementById(id), id);
       }
     }
   }
@@ -204,6 +218,9 @@ audioOutputSelect.disabled = !("sinkId" in HTMLMediaElement.prototype);
 audioInputSelect.addEventListener("change", startStream);
 videoInputSelect.addEventListener("change", startStream);
 audioOutputSelect.addEventListener("change", changeAudioDestination);
+
+fishAnimation("myVideoPosition");
+dragElement(document.getElementById("myVideoPosition"), "myVideoPosition");
 
 async function getDevices() {
   let devicesInfo = await navigator.mediaDevices.enumerateDevices();
@@ -251,6 +268,7 @@ function gotDevices(deviceInfos) {
 
 function gotStream(stream) {
   localCam = stream; // make stream available to console
+  if (micPaused && localCam.getAudioTracks()[0].enabled) pauseMic();
 
   // cameraPaused = false;
   // micPaused = false;
@@ -267,11 +285,12 @@ function gotStream(stream) {
   } else {
     videoElement.src = window.URL.createObjectURL(videoStream);
   }
-
   videoElement.play();
 
-  mediasoupPeer.addTrack(videoTrack, "video");
-  mediasoupPeer.addTrack(audioTrack, "audio");
+  setTimeout(() => {
+    mediasoupPeer.addTrack(videoTrack, "video");
+    mediasoupPeer.addTrack(audioTrack, "audio");
+  }, 2500); // add delay here because mediasoupPeer takes a few seconds to set up
 
   // Refresh button list in case labels have become available
   return navigator.mediaDevices.enumerateDevices();
@@ -320,14 +339,17 @@ async function startStream() {
     });
   }
 
+  // if(localCam && localCam.getAudioTracks()[0].enabled && micPaused)
+
   const audioSource = audioInputSelect.value;
   const videoSource = videoInputSelect.value;
   const constraints = {
     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
-      width: { ideal: 320 },
-      height: { ideal: 240 },
+      // width: { ideal: 1280 },
+      // height: { ideal: 720 },
+      width: { ideal: 200 },
     },
   };
   navigator.mediaDevices
@@ -335,6 +357,94 @@ async function startStream() {
     .then(gotStream)
     .then(gotDevices)
     .catch(handleError);
+}
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+
+function fishAnimation(elementId) {
+  let parentElElement = document.getElementById(elementId);
+  let v = 1;
+  let toRight = true;
+  intervals[elementId] = setInterval(function () {
+    let leftDistance = parseInt(parentElElement.style.left);
+    let windowWidth = window.innerWidth;
+    if (toRight == true) {
+      if (leftDistance < windowWidth - 200) {
+        parentElElement.style.left = parentElElement.offsetLeft + v + "px";
+      } else toRight = false;
+    } else {
+      if (leftDistance > 10) {
+        parentElElement.style.left = parentElElement.offsetLeft - v + "px";
+      } else toRight = true;
+    }
+  }, 10);
+}
+let fishflapSound = document.getElementById("fishflap");
+fishflapSound.volume = 0.05;
+
+function fishCaught(elementId) {
+  let parentElElement = document.getElementById(elementId);
+  clearInterval(intervals[elementId]);
+  intervals[elementId] = setInterval(function () {
+    if (parentElElement.style.transform != "rotate(-30deg)")
+      parentElElement.style.transform = "rotate(-30deg)";
+    else parentElElement.style.transform = "rotate(-20deg)";
+  }, 80);
+  fishflapSound.play();
+}
+
+function fishFree(elementId) {
+  let parentElElement = document.getElementById(elementId);
+  parentElElement.style.transform = "rotate(0deg)";
+  clearInterval(intervals[elementId]);
+  fishAnimation(elementId);
+  fishflapSound.pause();
+}
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+
+function dragElement(elmnt, elementId) {
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  elmnt.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+    // fish is caught:
+    console.log("呜呜呜被抓了想哭");
+    fishCaught(elementId);
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+    // fish is free:
+    console.log("我免费啦");
+    fishFree(elementId);
+  }
 }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
@@ -372,343 +482,3 @@ function resumeMic() {
 }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
-
-class PortalScene {
-  constructor() {
-    this.BACKGROUND_LAYER = 10;
-    this.scene = new THREE.Scene();
-
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-
-    this.aspect = this.width / this.height;
-    console.log("Aspect ratio: ", this.aspect);
-
-    this.portalWidth = 6;
-    this.portalHeight = this.portalWidth / this.aspect;
-
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      this.width / this.height,
-      0.1,
-      5000
-    );
-    this.camera.position.set(0, 0, 0.1);
-
-    this.mouse = new THREE.Vector2();
-
-    // create an AudioListener and add it to the camera
-    this.listener = new THREE.AudioListener();
-    this.camera.add(this.listener);
-    this.scene.add(this.camera);
-
-    this.camera.lookAt(0, 0, 0);
-
-    this.renderer = new THREE.WebGLRenderer({
-      antialiasing: true,
-    });
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.setClearColor(new THREE.Color(0x000000), 1); // change sky color
-    this.renderer.setSize(this.width, this.height);
-
-    // orbit controls for testing
-    const controls = new OrbitControls(this.camera, this.renderer.domElement);
-    // controls.maxAzimuthAngle = (Math.PI / 2) * 0.75;
-    // controls.minAzimuthAngle = (-Math.PI / 2) * 0.75;
-    // controls.maxPolarAngle = Math.PI * 0.75;
-    // controls.minPolarAngle = Math.PI * 0.25;
-    // console.log(controls);
-
-    const domElement = document.getElementById("canvasContainer");
-    //Push the canvas to the DOM
-    domElement.append(this.renderer.domElement);
-
-    //Setup event listeners for events and handle the states
-    window.addEventListener("resize", (e) => this.onWindowResize(e), false);
-    window.addEventListener("mousemove", (e) => this.onMouseMove(e), false);
-
-    // Helpers
-    this.helperGrid = new THREE.GridHelper(500, 500);
-    this.helperGrid.position.y = -this.portalHeight / 2 - 0.01; // offset the grid down to avoid z fighting with floor
-    this.scene.add(this.helperGrid);
-
-    // setup GLTF / Draco Loader
-    // const dracoURL = new URL("../libs/draco", import.meta.url);
-    // const dracoURL = "./draco";
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath(
-      "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/libs/draco/"
-    );
-    // dracoLoader.setDecoderConfig({ type: "wasm" });
-    console.log(dracoLoader);
-
-    this.gltfLoader = new GLTFLoader();
-    this.gltfLoader.setDRACOLoader(dracoLoader);
-
-    this.setupCubeCameraForEnvironment();
-
-    this.addLights();
-    this.addStencil();
-    this.addPortalSides();
-
-    const video = document.getElementById("testVideo");
-    video.play();
-    this.addEquirectangularVideo(video);
-
-    this.loop();
-  }
-
-  addWebcamVideo(videoEl) {
-    console.log("adding webcam video", videoEl);
-    const geometry = new THREE.PlaneGeometry(4, 4);
-    // invert the geometry on the x-axis so that all of the faces point inward
-    // geometry.scale(-1, 1, 1);
-
-    const texture = new THREE.VideoTexture(videoEl);
-    const material = new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.DoubleSide,
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-
-    mesh.position.set(0, 0, 2);
-    mesh.layers.set(this.BACKGROUND_LAYER);
-    this.scene.add(mesh);
-  }
-
-  // setup environment mapping which may be useful or interesting!
-  setupCubeCameraForEnvironment() {
-    this.cubeRenderTarget = new THREE.WebGLCubeRenderTarget(1024);
-    this.cubeRenderTarget.texture.type = THREE.HalfFloatType;
-
-    this.cubeCamera = new THREE.CubeCamera(1, 1000, this.cubeRenderTarget);
-    this.cubeCamera.layers.set(this.BACKGROUND_LAYER);
-
-    const material = new THREE.MeshStandardMaterial({
-      // map: this.cubeRenderTarget.texture,
-      color: 0xffffff,
-      envMap: this.cubeRenderTarget.texture,
-      roughness: 0.01,
-      metalness: 0.99,
-      side: THREE.DoubleSide,
-    });
-
-    const sphere = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(5, 8),
-      material
-    );
-    this.scene.add(sphere);
-  }
-
-  addLights() {
-    this.scene.add(new THREE.AmbientLight(new THREE.Color(0xffffff), 0.5));
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(10, 10, -20);
-    directionalLight.lookAt(0, 0, 0);
-    this.scene.add(directionalLight);
-  }
-
-  addEquirectangularVideo(videoEl) {
-    if (this.videoMesh360) {
-      console.log("removing old background");
-      this.scene.remove(this.videoMesh360);
-    }
-    const geometry = new THREE.SphereGeometry(1000, 60, 40);
-    // invert the geometry on the x-axis so that all of the faces point inward
-    geometry.scale(-1, 1, 1);
-
-    const texture = new THREE.VideoTexture(videoEl);
-    const material = new THREE.MeshBasicMaterial({ map: texture });
-
-    const mesh = new THREE.Mesh(geometry, material);
-    this.scene.add(mesh);
-    this.videoMesh360 = mesh;
-    mesh.layers.set(this.BACKGROUND_LAYER);
-  }
-
-  addPortalSides() {
-    // const normalMap = new THREE.CanvasTexture(new FlakesTexture());
-    // normalMap.wrapS = THREE.RepeatWrapping;
-    // normalMap.wrapT = THREE.RepeatWrapping;
-    // normalMap.repeat.x = 10;
-    // normalMap.repeat.y = 6;
-    // normalMap.anisotropy = 16;
-    const sharedMaterialProps = {
-      // clearcoat: 1.0,
-      // clearcoatRoughness: 0.1,
-      // metalness: 0.9,
-      // roughness: 0.5,
-      // normalMap,
-      // normalScale: new THREE.Vector2(0.25, 0.25),
-    };
-    const sideDepth = 1;
-    // left
-    let geo = new THREE.PlaneGeometry(sideDepth, this.portalHeight);
-    let mat = new THREE.MeshPhongMaterial({
-      color: 0xff00ff,
-      side: THREE.DoubleSide,
-      ...sharedMaterialProps,
-    });
-    let side = new THREE.Mesh(geo, mat);
-    side.position.set(-this.portalWidth / 2, 0, -sideDepth / 2);
-    side.rotateY(Math.PI / 2);
-    this.scene.add(side);
-    this.portalLeftMesh = side;
-
-    // right
-    geo = new THREE.PlaneGeometry(sideDepth, this.portalHeight);
-    mat = new THREE.MeshPhongMaterial({
-      color: 0xffeeaa,
-      side: THREE.DoubleSide,
-      ...sharedMaterialProps,
-    });
-    side = new THREE.Mesh(geo, mat);
-    side.position.set(this.portalWidth / 2, 0, -sideDepth / 2);
-    side.rotateY(-Math.PI / 2);
-    this.scene.add(side);
-
-    this.portalRightMesh = side;
-
-    // top
-    geo = new THREE.PlaneGeometry(this.portalWidth, sideDepth);
-    mat = new THREE.MeshPhongMaterial({
-      color: 0xbbcc33,
-      side: THREE.DoubleSide,
-      ...sharedMaterialProps,
-    });
-    side = new THREE.Mesh(geo, mat);
-    side.position.set(0, this.portalHeight / 2, -sideDepth / 2);
-    side.rotateX(Math.PI / 2);
-    this.scene.add(side);
-
-    this.portalTopMesh = side;
-
-    // bottom
-    geo = new THREE.PlaneGeometry(this.portalWidth, sideDepth);
-    mat = new THREE.MeshPhongMaterial({
-      color: 0xffeeaa,
-      side: THREE.DoubleSide,
-      ...sharedMaterialProps,
-    });
-    side = new THREE.Mesh(geo, mat);
-    side.position.set(0, -this.portalHeight / 2, -sideDepth / 2);
-    side.rotateX(-Math.PI / 2);
-    this.scene.add(side);
-
-    this.portalBottomMesh = side;
-  }
-
-  addStencil() {
-    const geo = new THREE.PlaneGeometry(this.portalWidth, this.portalHeight);
-    const mat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    this.scene.add(mesh);
-    mesh.layers.set(1);
-  }
-
-  loop() {
-    // controls wander back to center
-    this.cubeCamera.update(this.renderer, this.scene);
-    this.renderer.render(this.scene, this.camera);
-    // this.render();
-
-    window.requestAnimationFrame(() => this.loop());
-  }
-
-  render() {
-    // stencil buffer setup with thanks to https://github.com/stemkoski/AR-Examples/blob/master/stencil-test.html
-    let gl = this.renderer.getContext();
-
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.STENCIL_TEST);
-
-    // do not clear buffers before each render
-    this.renderer.autoClear = false;
-    // clear buffers now: color, depth, stencil
-    this.renderer.clear(true, true, true);
-
-    // goal: write 1s to stencil buffer in position of plane
-
-    // activate only layer 1, which only contains the plane
-    this.camera.layers.set(1);
-
-    /*
-    glStencilFunc specifies a test to apply to each pixel of the stencil buffer
-    glStencilFunc(OP, ref, mask)
-    creates the test: (ref & mask) OP (stencil & mask)
-    parameters:
-      OP: GL_NEVER, GL_ALWAYS, GL_EQUAL, GL_NOTEQUAL, 
-          GL_LESS, GL_LEQUAL, GL_GEQUAL, GL_GREATER
-      ref: a fixed integer used in the comparison
-      mask: a mask applied to both ref and the stencil pixel; use 0xFF to disable 
-    */
-    // always true (always passes); ref = 1.
-    gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-
-    /*
-    glStencilOp specifies the action to apply depending on the test results from glStencilFunc
-    glStencilOp(sFail, sPass_dFail, sPass_dPassOrDisabled)
-    sFail: the test from glStencilFunc failed
-    sPass_dFail: the test from glStencilFunc passed, but the depth buffer test failed
-    sPass_dPassOrDisabled: the test from glStencilFunc passed, and the depth buffer passed or is disabled
-    */
-    gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
-    gl.stencilMask(0xff);
-
-    // during render, do not modify the color or depth buffers (thus only the stencil buffer will be affected)
-    gl.colorMask(false, false, false, false);
-    gl.depthMask(false);
-
-    this.renderer.render(this.scene, this.camera);
-
-    // SECOND PASS
-
-    // need to clear the depth buffer, in case of occlusion by other objects
-    this.renderer.clear(false, true, false);
-
-    // now modify all the buffers again
-    gl.colorMask(true, true, true, true);
-    gl.depthMask(true);
-
-    // just draw where stencil buffer = 1
-    // fragments are only rendered if they pass both the depth test
-    //  *and* the stencil test (as specified by glStencilFunc)
-    gl.stencilFunc(gl.EQUAL, 1, 0xff);
-
-    gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-
-    this.camera.layers.set(0); // layer 0 contains everything but plane
-
-    this.cubeCamera.update(this.renderer, this.scene);
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
-  //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
-  // Event Handlers 🍽
-
-  onWindowResize(e) {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-    this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(this.width, this.height);
-  }
-
-  onMouseMove(event) {
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-
-    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  }
-}
-
-const map = (value, x1, y1, x2, y2) =>
-  ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;

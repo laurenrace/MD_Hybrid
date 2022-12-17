@@ -13,8 +13,9 @@
     <style>
       html,
       body {
-        background-color: rgb(0, 0, 0);
+        background-color: rgb(85, 159, 149);
         color: #eee;
+        overflow: hidden;
       }
 
       .infoCard {
@@ -48,99 +49,84 @@
         overflow: scroll;
         overflow-x: hidden;
       }
-      #canvasContainer {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-      }
     </style>
   </head>
 
   <body>
-     <!-- TEST VIDEO -->
-     <video
-     id="testVideo"
-     loop
-     muted
-     crossorigin="anonymous"
-     playsinline
-     style="display: none"
-   >
-     <source src="./video.mp4" />
-   </video>
+    <img class="bgImg" src="../assets/undersea.png" width="100%" />
+    <div
+      id="canvasContainer"
+      style="
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100;
+        top: 0px;
+        left: 0px;
+      "
+    ></div>
 
-   
-    <div id="canvasContainer"></div>
+    <!-- PEERS VIDEOS -->
+    <!-- <div class="row" id="peersVideos"></div> -->
 
-    <div class="container-fluid h-100">
-      <div class="row p-3 h-100">
-        <div class="col h-100">
-          
-
-                <div class="row" id="peersVideos"></div>
-              
-
-          <div class="row" style="height: 400px">
-            <!-- SELF VIEW & CONTROLS -->
-            <div class="col-md-6 border">
-              <div class="row p-1">
-                <h5
-                  style="
-                    color: rgb(255, 255, 255);
-                    background-color: rgb(90, 65, 255);
-                  "
-                >
-                  SELF VIEW
-                </h5>
-              </div>
-
-              <!-- LOCAL VIDEO -->
-              <div class="row">
-                <!-- select peer's video, local video scales down size, float on peer's video-->
-                <div class="col d-flex justify-content-center">
-                  <video id="local_video" autoplay playsinline muted></video>
-                </div>
-              </div>
-
-              <!-- LOBBY CONTROLS -->
-              <div class="row d-flex justify-content-center align-items-center">
-                <div class="col">
-                  <label for="videoSource"
-                    ><button id="toggleCameraPausedButton" class="buttonActive">
-                      CAMERA ON
-                    </button></label
-                  >
-                </div>
-                <div class="col"><select id="videoSource"></select></div>
-              </div>
-
-              <div class="row align-self-center">
-                <div class="col">
-                  <label for="audioSource"
-                    ><button
-                      id="toggleMicrophonePausedButton"
-                      class="buttonActive"
-                    >
-                      MIC ON
-                    </button></label
-                  >
-                </div>
-                <div class="col"><select id="audioSource"></select></div>
-              </div>
-
-              <div class="col align-self-center" style="display: none">
-                <div class="select">
-                  <label for="audioOutput">Audio output destination: </label
-                  ><select id="audioOutput"></select>
-                </div>
-              </div>
-            </div>
-
-          
+    <!-- LOCAL VIDEO ALL COMPONENTS -->
+    <div
+      id="myVideoPosition"
+      style="width: 200px; position: absolute; top: 100px; left: 300px"
+    >
+      <div class="row">
+        <!-- LOCAL VIDEO -->
+        <div class="row">
+          <!-- select peer's video, local video scales down size, float on peer's video-->
+          <div class="col d-flex">
+            <video id="local_video" autoplay playsinline muted></video>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- LOBBY CONTROLS -->
+    <div class="col" style="position: absolute; bottom: 10px">
+      <div class="row">
+        <label for="videoSource"
+          ><button id="toggleCameraPausedButton" class="buttonActive">
+            CAMERA ON
+          </button></label
+        >
+      </div>
+      <div class="row">
+        <div class="col"><select id="videoSource"></select></div>
+      </div>
+      <div class="row">
+        <label for="audioSource"
+          ><button id="toggleMicrophonePausedButton" class="buttonActive">
+            MIC OFF
+          </button></label
+        >
+      </div>
+      <div class="row">
+        <div class="col"><select id="audioSource"></select></div>
+      </div>
+
+      <div class="col align-self-center" style="display: none">
+        <div class="select">
+          <label for="audioOutput">Audio output destination: </label
+          ><select id="audioOutput"></select>
+        </div>
+      </div>
+    </div>
+    <div
+      class="col"
+      style="position: absolute; right: 0px; bottom: 10px; z-index: 101"
+    >
+      <audio id="underwater" controls loop style="transform: scale(0.8)">
+        <source src="../assets/wintersound.mp3" type="audio/mpeg" />
+      </audio>
+    </div>
+
+    <audio id="fishflap" loop hidden>
+      <source src="../assets/fishflap.mp3" type="audio/mpeg" />
+    </audio>
 
     <script type="module" src="./index.js"></script>
   </body>

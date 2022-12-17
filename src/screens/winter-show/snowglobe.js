@@ -1,10 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-// import { FlakesTexture } from "three/examples/jsm/textures/FlakesTexture.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import { Mesh } from "three";
 
 export class Snowglobe {
   constructor() {
@@ -21,12 +19,11 @@ export class Snowglobe {
     this.textureLoader = new THREE.TextureLoader();
 
     this.camera = new THREE.PerspectiveCamera(
-      50,
+      40,
       this.width / this.height,
       0.01,
       5000
     );
-    this.camera.position.set(0, 0.25, 0.5);
 
     this.mouse = new THREE.Vector2();
 
@@ -34,8 +31,9 @@ export class Snowglobe {
     this.listener = new THREE.AudioListener();
     this.camera.add(this.listener);
     this.scene.add(this.camera);
+    this.camera.position.set(0, 0.75, 3);
 
-    this.camera.lookAt(0, 0, 0);
+    this.camera.lookAt(0, 0.85, 0);
 
     this.renderer = new THREE.WebGLRenderer({
       antialiasing: true,
@@ -46,8 +44,8 @@ export class Snowglobe {
     this.renderer.setSize(this.width, this.height);
 
     // orbit controls for testing
-    const controls = new OrbitControls(this.camera, this.renderer.domElement);
-    controls.target.set(0, 0.25, 0);
+    // const controls = new OrbitControls(this.camera, this.renderer.domElement);
+    // controls.target.set(0, 0.25, 0);
     // controls.maxAzimuthAngle = (Math.PI / 2) * 0.75;
     // controls.minAzimuthAngle = (-Math.PI / 2) * 0.75;
     // controls.maxPolarAngle = Math.PI * 0.75;
@@ -216,6 +214,18 @@ export class Snowglobe {
       this.scene.environment = hdrEquirect;
       //   this.scene.background = hdrEquirect;
     });
+
+    // add background image
+    const bgImg = this.textureLoader.load(
+      new URL("../../assets/winter.png", import.meta.url)
+    );
+    const geo = new THREE.PlaneGeometry(10, 6);
+    const mat = new THREE.MeshBasicMaterial({ map: bgImg });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(0, 1.5, -3);
+
+    // mesh.rotateY(Math.PI);
+    this.scene.add(mesh);
   }
 
   addSnowflakeWithVideo(videoEl, id) {
@@ -242,8 +252,8 @@ export class Snowglobe {
   }
 
   loop() {
-    for (let i = 0; i < this.snowflakes.length; i++) {
-      this.snowflakes[i].update();
+    for (let id in this.snowflakes) {
+      this.snowflakes[id].update();
     }
     // controls wander back to center
     this.renderer.render(this.scene, this.camera);
@@ -278,35 +288,23 @@ const map = (value, x1, y1, x2, y2) =>
 class Snowflake {
   constructor(scene, videoEl) {
     this.scene = scene;
-    this.textureLoader = new THREE.TextureLoader();
 
-    const maskTex = this.textureLoader.load(
-      new URL("../../assets/snowflake.png", import.meta.url)
-    );
-
-    const geometry = new THREE.PlaneGeometry(0.05, 0.05);
+    const geometry = new THREE.PlaneGeometry(0.15, 0.15);
     let material;
     if (videoEl) {
       const texture = new THREE.VideoTexture(videoEl);
-      material = new THREE.MeshPhongMaterial({
+      material = new THREE.MeshBasicMaterial({
         map: texture,
-        // alphaMap: maskTex,
-        // transparent: true,
+        side: THREE.DoubleSide,
       });
     } else {
       material = new THREE.MeshPhongMaterial({ color: white });
     }
 
-    this.mesh = new THREE.Group();
-    //THREE.Mesh(geometry, material);
+    this.rotationSpeed = Math.random() * 0.01;
+    this.speed = Math.random() * 0.001;
 
-    let max = 5;
-    for (let i = 0; i < 5; i++) {
-      let newMesh = new THREE.Mesh(geometry, material);
-      newMesh.rotateY(i * (180 / (max - 1)));
-      this.mesh.add(newMesh);
-    }
-    // this.mesh.rotateX(-Math.PI / 2);
+    this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.set(rr(0.25), 0.75, rr(0.25));
     this.scene.add(this.mesh);
 
@@ -317,14 +315,12 @@ class Snowflake {
 
   update() {
     // movement
-    this.mesh.position.y -= 0.0001;
-    this.mesh.rotateY(0.01);
+    this.mesh.position.y -= this.speed;
+    this.mesh.rotateY(this.rotationSpeed);
 
     if (this.mesh.position.y < 0.25) {
       this.mesh.position.y = 0.75;
     }
-    // reset if at bottom
-    // remove if video is active
   }
 
   remove() {
