@@ -4,6 +4,9 @@ var request = require("request");
 
 var intervals = {};
 
+
+document.getElementById("underwater").volume = 1;
+
 let socket;
 let mediasoupPeer;
 let localCam;
@@ -372,6 +375,8 @@ function fishAnimation(elementId) {
     }
   }, 10);
 }
+let fishflapSound =  document.getElementById("fishflap");
+fishflapSound.volume=0.05;
 
 function fishCaught(elementId) {
   let parentElElement = document.getElementById(elementId);
@@ -382,6 +387,7 @@ function fishCaught(elementId) {
     else
       parentElElement.style.transform = 'rotate(-20deg)';
   }, 80);
+  fishflapSound.play();
 }
 
 function fishFree(elementId) {
@@ -389,6 +395,7 @@ function fishFree(elementId) {
   parentElElement.style.transform = 'rotate(0deg)';
   clearInterval(intervals[elementId]);
   fishAnimation(elementId);
+  fishflapSound.pause();
 }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
