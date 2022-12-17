@@ -25,8 +25,9 @@ function init() {
 
   if (process.env.ENVIRONMENT === "dev") {
     // for local development
-    let host = window.location.hostname;
-    socket = io("https://" + host + "/");
+    // let host = window.location.hostname;
+    // socket = io("https://" + host + "/");
+    socket = io("https://localhost:3095/", { path: "/socket.io" });
   } else {
     // for production
     socket = io("https://yorb.itp.io/", { path: "/hybrid/socket.io" });
@@ -55,7 +56,8 @@ function init() {
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
     delete peers[id];
-    document.getElementById(id + "_video").remove();
+    // document.getElementById(id + "_video").remove();
+    document.getElementById(id).remove();
   });
 
   cameraPausedButton.addEventListener("click", () => {
@@ -137,18 +139,31 @@ function gotTrack(track, id, label) {
     if (el == null) {
       console.log("Creating video element for client with ID: " + id);
       el = document.createElement("video");
-      el.className = "peerVideo";
       el.id = id + "_video";
       el.autoplay = true;
       el.muted = true;
       el.setAttribute("playsinline", true);
 
       const parentEl = document.createElement("div");
-      parentEl.className = "col";
+      // parentEl.className = "col";
+      parentEl.setAttribute("id", id);
+      parentEl.setAttribute("style", "border:1px solid #ffffff; position: absolute;");
+      parentEl.style.visibility = 'visible';
+      parentEl.style.top = (window.innerHeight - 100) * Math.random() + "px";
+      parentEl.style.left = (window.innerWidth - 220) * Math.random() + "px";
+      parentEl.style.width = 210 + "px";
+      parentEl.style.height = 150 + "px";
+      // console.log("hhhhh",document.getElementsByTagName("video"));
+
       parentEl.appendChild(el);
 
-      // el.style = "visibility: hidden;";
-      document.getElementById("peersVideos").appendChild(parentEl);
+      // document.getElementById("peersVideos").appendChild(parentEl);
+
+      document.body.appendChild(parentEl);
+      if (document.body.appendChild(parentEl)) {
+        fishAnimation(id);
+        dragElement(document.getElementById(id), id);
+      }
     }
   }
 
@@ -188,6 +203,11 @@ audioOutputSelect.disabled = !("sinkId" in HTMLMediaElement.prototype);
 audioInputSelect.addEventListener("change", startStream);
 videoInputSelect.addEventListener("change", startStream);
 audioOutputSelect.addEventListener("change", changeAudioDestination);
+
+fishAnimation("myVideoPosition");
+dragElement(document.getElementById("myVideoPosition"), "myVideoPosition");
+
+
 
 async function getDevices() {
   let devicesInfo = await navigator.mediaDevices.enumerateDevices();
@@ -251,8 +271,8 @@ function gotStream(stream) {
   } else {
     videoElement.src = window.URL.createObjectURL(videoStream);
   }
-
   videoElement.play();
+
 
   setTimeout(() => {
     mediasoupPeer.addTrack(videoTrack, "360");
@@ -312,8 +332,9 @@ async function startStream() {
     audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
-      width: { ideal: 1280 },
-      height: { ideal: 720 },
+      // width: { ideal: 1280 },
+      // height: { ideal: 720 },
+      width: { ideal: 200 },
     },
   };
   navigator.mediaDevices
@@ -322,6 +343,81 @@ async function startStream() {
     .then(gotDevices)
     .catch(handleError);
 }
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+var interval
+function fishAnimation(elementId) {
+  var parentElElement = document.getElementById(elementId);
+  var toRight = true;
+  interval = setInterval(function () {
+    let leftDistance = parseInt(parentElElement.style.left);
+    if (toRight == true) {
+      if (leftDistance < window.innerWidth - 200) {
+        parentElElement.style.left = parentElElement.offsetLeft + 1 + "px";
+      } else toRight = false;
+    } else {
+      if (leftDistance > 10) {
+        parentElElement.style.left = parentElElement.offsetLeft - 1 + "px";
+      } else toRight = true;
+    }
+  }, 10);
+}
+
+function fishCaught(elementId) {
+  var parentElElement = document.getElementById(elementId);
+  parentElElement.style.transform = 'rotate(-30deg)';
+  clearInterval(interval);
+}
+
+function fishFree(elementId) {
+  var parentElElement = document.getElementById(elementId);
+  parentElElement.style.transform = 'rotate(0deg)';
+  fishAnimation(elementId);
+}
+
+//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+
+function dragElement(elmnt, elementId) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  elmnt.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+    // fish is caught:
+    console.log("呜呜呜被抓了想哭");
+    fishCaught(elementId);
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+    // fish is free:
+    console.log("我免费啦");
+    fishFree(elementId);
+  }
+}
+
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
