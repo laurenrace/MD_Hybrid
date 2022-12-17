@@ -46,21 +46,17 @@
       overflow: scroll;
       overflow-x: hidden;
     }
-
   </style>
 </head>
 
 <body>
 
-  <audio controls autoplay hidden loop>
-    <source src="../../../dist/underwater.mp3" type="audio/mpeg">
-  </audio>
 
-  <img class="bgImg" src="../../../dist/undersea.png" width="100%" >
+
+  <img class="bgImg" src="../../../dist/undersea.png" width="100%">
 
   <!-- PEERS VIDEOS -->
   <!-- <div class="row" id="peersVideos"></div> -->
-
 
   <!-- LOCAL VIDEO ALL COMPONENTS -->
   <div id="myVideoPosition" style="width:200px; position: absolute; top:100px;left:300px;">
@@ -74,9 +70,9 @@
       </div>
     </div>
   </div>
-  
+
   <!-- LOBBY CONTROLS -->
-  <div class="col" style="position: absolute;bottom: 10px;">
+  <div class="col" style="position: absolute; bottom: 10px;">
     <div class="row">
       <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive">
           CAMERA ON
@@ -99,6 +95,13 @@
         <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
       </div>
     </div>
+
+
+  </div>
+  <div class="col" style="position: absolute;right:0px;bottom: 10px;">
+    <audio controls loop style="transform: scale(0.8)">
+      <source src="../../../dist/underwater.mp3" type="audio/mpeg">
+    </audio>
   </div>
 
   <script type="module" src="./index.js"></script>
