@@ -1,9 +1,10 @@
 import { io } from "socket.io-client";
 import { SimpleMediasoupPeer } from "simple-mediasoup-peer-client";
 var request = require("request");
+import { Snowglobe } from "./snowglobe";
 
+let snowglobeScene;
 var intervals = {};
-
 
 document.getElementById("underwater").volume = 1;
 
@@ -13,7 +14,6 @@ let localCam;
 
 let cameraPaused = false;
 let micPaused = true;
-
 
 let hasInitializedCameraAccess = false;
 
@@ -38,6 +38,7 @@ function init() {
     // for production
     socket = io("https://yorb.itp.io/", { path: "/hybrid/socket.io" });
   }
+  snowglobeScene = new Snowglobe();
 
   mediasoupPeer = new SimpleMediasoupPeer(socket);
   mediasoupPeer.on("track", gotTrack);
@@ -61,6 +62,7 @@ function init() {
 
   socket.on("clientDisconnected", (id) => {
     console.log("Client disconencted:", id);
+    snowglobeScene.removeSnowflake(id);
     delete peers[id];
     // document.getElementById(id + "_video").remove();
     document.getElementById(id).remove();
@@ -82,7 +84,6 @@ function init() {
     }
   });
   initialize();
-
 }
 
 function updateCameraPausedButton() {
@@ -153,8 +154,11 @@ function gotTrack(track, id, label) {
       const parentEl = document.createElement("div");
       // parentEl.className = "col";
       parentEl.setAttribute("id", id);
-      parentEl.setAttribute("style", "border:0px solid #ffffff; position: absolute;");
-      parentEl.style.visibility = 'visible';
+      parentEl.setAttribute(
+        "style",
+        "border:0px solid #ffffff; position: absolute;"
+      );
+      parentEl.style.visibility = "visible";
       parentEl.style.top = (window.innerHeight - 100) * Math.random() + "px";
       parentEl.style.left = (window.innerWidth - 220) * Math.random() + "px";
       parentEl.style.width = 210 + "px";
@@ -162,6 +166,7 @@ function gotTrack(track, id, label) {
       // console.log("hhhhh",document.getElementsByTagName("video"));
 
       parentEl.appendChild(el);
+      snowglobeScene.addSnowflakeWithVideo(el, id);
 
       // document.getElementById("peersVideos").appendChild(parentEl);
 
@@ -212,8 +217,6 @@ audioOutputSelect.addEventListener("change", changeAudioDestination);
 
 fishAnimation("myVideoPosition");
 dragElement(document.getElementById("myVideoPosition"), "myVideoPosition");
-
-
 
 async function getDevices() {
   let devicesInfo = await navigator.mediaDevices.enumerateDevices();
@@ -280,7 +283,6 @@ function gotStream(stream) {
   }
   videoElement.play();
 
-
   setTimeout(() => {
     mediasoupPeer.addTrack(videoTrack, "360");
     mediasoupPeer.addTrack(audioTrack, "audio");
@@ -333,8 +335,7 @@ async function startStream() {
     });
   }
 
-  // if(localCam && localCam.getAudioTracks()[0].enabled && micPaused) 
-
+  // if(localCam && localCam.getAudioTracks()[0].enabled && micPaused)
 
   const audioSource = audioInputSelect.value;
   const videoSource = videoInputSelect.value;
@@ -356,7 +357,6 @@ async function startStream() {
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
-
 function fishAnimation(elementId) {
   let parentElElement = document.getElementById(elementId);
   let v = 1;
@@ -375,24 +375,23 @@ function fishAnimation(elementId) {
     }
   }, 10);
 }
-let fishflapSound =  document.getElementById("fishflap");
-fishflapSound.volume=0.05;
+let fishflapSound = document.getElementById("fishflap");
+fishflapSound.volume = 0.05;
 
 function fishCaught(elementId) {
   let parentElElement = document.getElementById(elementId);
   clearInterval(intervals[elementId]);
   intervals[elementId] = setInterval(function () {
-    if (parentElElement.style.transform != 'rotate(-30deg)')
-      parentElElement.style.transform = 'rotate(-30deg)';
-    else
-      parentElElement.style.transform = 'rotate(-20deg)';
+    if (parentElElement.style.transform != "rotate(-30deg)")
+      parentElElement.style.transform = "rotate(-30deg)";
+    else parentElElement.style.transform = "rotate(-20deg)";
   }, 80);
   fishflapSound.play();
 }
 
 function fishFree(elementId) {
   let parentElElement = document.getElementById(elementId);
-  parentElElement.style.transform = 'rotate(0deg)';
+  parentElElement.style.transform = "rotate(0deg)";
   clearInterval(intervals[elementId]);
   fishAnimation(elementId);
   fishflapSound.pause();
@@ -401,7 +400,10 @@ function fishFree(elementId) {
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
 function dragElement(elmnt, elementId) {
-  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
   elmnt.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
@@ -427,8 +429,8 @@ function dragElement(elmnt, elementId) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
   }
 
   function closeDragElement() {
@@ -440,7 +442,6 @@ function dragElement(elmnt, elementId) {
     fishFree(elementId);
   }
 }
-
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
