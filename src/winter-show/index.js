@@ -6,7 +6,7 @@ import { Snowglobe } from "./snowglobe";
 let snowglobeScene;
 var intervals = {};
 
-document.getElementById("underwater").volume = 1;
+// document.getElementById("underwater").volume = 1;
 
 let socket;
 let mediasoupPeer;
@@ -130,17 +130,17 @@ function initialize() {
 function gotTrack(track, id, label) {
   console.log(`Got track of kind ${label} from ${id}`);
 
-  let isBroadcast = label == "video-broadcast" || label == "audio-broadcast";
+  // let isBroadcast = label == "video-broadcast" || label == "audio-broadcast";
 
   let el = document.getElementById(id + "_" + label);
 
-  if (isBroadcast && track.kind === "video") {
-    el = document.getElementById("broadcastVideo");
-  }
-  if (isBroadcast && track.kind === "audio") {
-    el = document.getElementById("broadcastAudio");
-    el.volume = 1;
-  }
+  // if (isBroadcast && track.kind === "video") {
+  //   el = document.getElementById("broadcastVideo");
+  // }
+  // if (isBroadcast && track.kind === "audio") {
+  //   el = document.getElementById("broadcastAudio");
+  //   el.volume = 1;
+  // }
 
   if (track.kind === "video") {
     if (el == null) {
@@ -151,21 +151,21 @@ function gotTrack(track, id, label) {
       el.muted = true;
       el.setAttribute("playsinline", true);
 
-      const parentEl = document.createElement("div");
+      // const parentEl = document.createElement("div");
       // parentEl.className = "col";
-      parentEl.setAttribute("id", id);
-      parentEl.setAttribute(
-        "style",
-        "border:0px solid #ffffff; position: absolute;"
-      );
-      parentEl.style.visibility = "visible";
-      parentEl.style.top = (window.innerHeight - 100) * Math.random() + "px";
-      parentEl.style.left = (window.innerWidth - 220) * Math.random() + "px";
-      parentEl.style.width = 210 + "px";
-      parentEl.style.height = 150 + "px";
+      // parentEl.setAttribute("id", id);
+      // parentEl.setAttribute(
+      //   "style",
+      //   "border:0px solid #ffffff; position: absolute;"
+      // );
+      // parentEl.style.visibility = "visible";
+      // parentEl.style.top = (window.innerHeight - 100) * Math.random() + "px";
+      // parentEl.style.left = (window.innerWidth - 220) * Math.random() + "px";
+      // parentEl.style.width = 210 + "px";
+      // parentEl.style.height = 150 + "px";
       // console.log("hhhhh",document.getElementsByTagName("video"));
 
-      parentEl.appendChild(el);
+      // parentEl.appendChild(el);
 
       if (label === "360") {
         snowglobeScene.addITPVideo(el, id);
@@ -174,11 +174,11 @@ function gotTrack(track, id, label) {
       }
       // document.getElementById("peersVideos").appendChild(parentEl);
 
-      document.body.appendChild(parentEl);
-      if (document.body.appendChild(parentEl)) {
-        fishAnimation(id);
-        dragElement(document.getElementById(id), id);
-      }
+      // document.body.appendChild(parentEl);
+      // if (document.body.appendChild(parentEl)) {
+      //   fishAnimation(id);
+      //   dragElement(document.getElementById(id), id);
+      // }
     }
   }
 
@@ -220,7 +220,7 @@ videoInputSelect.addEventListener("change", startStream);
 audioOutputSelect.addEventListener("change", changeAudioDestination);
 
 fishAnimation("myVideoPosition");
-dragElement(document.getElementById("myVideoPosition"), "myVideoPosition");
+// dragElement(document.getElementById("myVideoPosition"), "myVideoPosition");
 
 async function getDevices() {
   let devicesInfo = await navigator.mediaDevices.enumerateDevices();
@@ -361,91 +361,91 @@ async function startStream() {
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
-function fishAnimation(elementId) {
-  let parentElElement = document.getElementById(elementId);
-  let v = 1;
-  let toRight = true;
-  intervals[elementId] = setInterval(function () {
-    let leftDistance = parseInt(parentElElement.style.left);
-    let windowWidth = window.innerWidth;
-    if (toRight == true) {
-      if (leftDistance < windowWidth - 200) {
-        parentElElement.style.left = parentElElement.offsetLeft + v + "px";
-      } else toRight = false;
-    } else {
-      if (leftDistance > 10) {
-        parentElElement.style.left = parentElElement.offsetLeft - v + "px";
-      } else toRight = true;
-    }
-  }, 10);
-}
-let fishflapSound = document.getElementById("fishflap");
-fishflapSound.volume = 0.05;
+// function fishAnimation(elementId) {
+//   let parentElElement = document.getElementById(elementId);
+//   let v = 1;
+//   let toRight = true;
+//   intervals[elementId] = setInterval(function () {
+//     let leftDistance = parseInt(parentElElement.style.left);
+//     let windowWidth = window.innerWidth;
+//     if (toRight == true) {
+//       if (leftDistance < windowWidth - 200) {
+//         parentElElement.style.left = parentElElement.offsetLeft + v + "px";
+//       } else toRight = false;
+//     } else {
+//       if (leftDistance > 10) {
+//         parentElElement.style.left = parentElElement.offsetLeft - v + "px";
+//       } else toRight = true;
+//     }
+//   }, 10);
+// }
+// let fishflapSound = document.getElementById("fishflap");
+// fishflapSound.volume = 0.05;
 
-function fishCaught(elementId) {
-  let parentElElement = document.getElementById(elementId);
-  clearInterval(intervals[elementId]);
-  intervals[elementId] = setInterval(function () {
-    if (parentElElement.style.transform != "rotate(-30deg)")
-      parentElElement.style.transform = "rotate(-30deg)";
-    else parentElElement.style.transform = "rotate(-20deg)";
-  }, 80);
-  fishflapSound.play();
-}
+// function fishCaught(elementId) {
+//   let parentElElement = document.getElementById(elementId);
+//   clearInterval(intervals[elementId]);
+//   intervals[elementId] = setInterval(function () {
+//     if (parentElElement.style.transform != "rotate(-30deg)")
+//       parentElElement.style.transform = "rotate(-30deg)";
+//     else parentElElement.style.transform = "rotate(-20deg)";
+//   }, 80);
+//   fishflapSound.play();
+// }
 
-function fishFree(elementId) {
-  let parentElElement = document.getElementById(elementId);
-  parentElElement.style.transform = "rotate(0deg)";
-  clearInterval(intervals[elementId]);
-  fishAnimation(elementId);
-  fishflapSound.pause();
-}
+// function fishFree(elementId) {
+//   let parentElElement = document.getElementById(elementId);
+//   parentElElement.style.transform = "rotate(0deg)";
+//   clearInterval(intervals[elementId]);
+//   fishAnimation(elementId);
+//   fishflapSound.pause();
+// }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
-function dragElement(elmnt, elementId) {
-  let pos1 = 0,
-    pos2 = 0,
-    pos3 = 0,
-    pos4 = 0;
-  elmnt.onmousedown = dragMouseDown;
+// function dragElement(elmnt, elementId) {
+//   let pos1 = 0,
+//     pos2 = 0,
+//     pos3 = 0,
+//     pos4 = 0;
+//   elmnt.onmousedown = dragMouseDown;
 
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-    // fish is caught:
-    console.log("呜呜呜被抓了想哭");
-    fishCaught(elementId);
-  }
+//   function dragMouseDown(e) {
+//     e = e || window.event;
+//     e.preventDefault();
+//     // get the mouse cursor position at startup:
+//     pos3 = e.clientX;
+//     pos4 = e.clientY;
+//     document.onmouseup = closeDragElement;
+//     // call a function whenever the cursor moves:
+//     document.onmousemove = elementDrag;
+//     // fish is caught:
+//     console.log("呜呜呜被抓了想哭");
+//     fishCaught(elementId);
+//   }
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
-  }
+//   function elementDrag(e) {
+//     e = e || window.event;
+//     e.preventDefault();
+//     // calculate the new cursor position:
+//     pos1 = pos3 - e.clientX;
+//     pos2 = pos4 - e.clientY;
+//     pos3 = e.clientX;
+//     pos4 = e.clientY;
+//     // set the element's new position:
+//     elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+//     elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+//   }
 
-  function closeDragElement() {
-    /* stop moving when mouse button is released:*/
-    document.onmouseup = null;
-    document.onmousemove = null;
-    // fish is free:
-    console.log("我免费啦");
-    fishFree(elementId);
-  }
-}
+//   function closeDragElement() {
+//     /* stop moving when mouse button is released:*/
+//     document.onmouseup = null;
+//     document.onmousemove = null;
+//     // fish is free:
+//     console.log("我免费啦");
+//     fishFree(elementId);
+//   }
+// }
 
 //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
 
