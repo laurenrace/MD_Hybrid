@@ -7,7 +7,8 @@ let mediasoupPeer;
 let localCam;
 
 let cameraPaused = false;
-let micPaused = false;
+let micPaused = true;
+
 
 let hasInitializedCameraAccess = false;
 
@@ -75,8 +76,8 @@ function init() {
       pauseMic();
     }
   });
-
   initialize();
+
 }
 
 function updateCameraPausedButton() {
@@ -255,6 +256,7 @@ function gotDevices(deviceInfos) {
 
 function gotStream(stream) {
   localCam = stream; // make stream available to console
+  if(micPaused && localCam.getAudioTracks()[0].enabled) pauseMic();
 
   // cameraPaused = false;
   // micPaused = false;
@@ -325,6 +327,9 @@ async function startStream() {
       track.stop();
     });
   }
+
+  // if(localCam && localCam.getAudioTracks()[0].enabled && micPaused) 
+  
 
   const audioSource = audioInputSelect.value;
   const videoSource = videoInputSelect.value;
