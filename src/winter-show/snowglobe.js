@@ -234,7 +234,7 @@ export class Snowglobe {
   }
 
   addITPVideo(videoEl, id) {
-    const geometry = new THREE.PlaneGeometry(10, 6);
+    const geometry = new THREE.PlaneGeometry(8, 5);
 
     const texture = new THREE.VideoTexture(videoEl);
     const material = new THREE.MeshBasicMaterial({
@@ -246,12 +246,27 @@ export class Snowglobe {
     mesh.position.set(0, 2, -3);
     // mesh.rotateY(2.5);
     this.scene.add(mesh);
+    this.itpScreen = {
+      id,
+      mesh,
+    };
   }
+
+  // removeITPVideo() {
+  //   if (this.itpScreen) {
+  //     this.itpScreen.removeFromParent();
+  //     this.itpScreen = null;
+  //   }
+  // }
 
   removeSnowflake(id) {
     if (this.snowflakes[id]) {
       this.snowflakes[id].remove();
       delete this.snowflakes[id];
+    }
+    if (this.itpScreen && this.itpScreen.id === id) {
+      this.itpScreen.mesh.removeFromParent();
+      this.itpScreen = null;
     }
   }
   addEquirectangularVideo(videoEl) {

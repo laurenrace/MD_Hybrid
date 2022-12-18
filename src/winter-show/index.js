@@ -88,6 +88,23 @@ function init() {
       pauseMic();
     }
   });
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === " ") {
+      if (micPaused) {
+        resumeMic();
+      }
+    }
+  });
+  document.addEventListener("keyup", (ev) => {
+    if (ev.key === " ") {
+      pauseMic();
+      // if (micPaused) {
+      // resumeMic();
+      // }
+    }
+  });
+
   initialize();
 }
 
