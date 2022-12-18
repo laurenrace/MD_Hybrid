@@ -110,7 +110,7 @@ export class Snowglobe {
   }
 
   addLights() {
-    this.scene.add(new THREE.AmbientLight(new THREE.Color(0xffffff), 0.5));
+    this.scene.add(new THREE.AmbientLight(new THREE.Color(0xffffff), 0.8));
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(10, 10, -20);
@@ -149,7 +149,7 @@ export class Snowglobe {
     woodNormal.wrapT = THREE.RepeatWrapping;
     woodNormal.repeat.set(6, 6);
     // add table
-    const tableGeo = new THREE.BoxGeometry(3, 0.1, 2);
+    const tableGeo = new THREE.BoxGeometry(5, 0.1, 2);
     const tableMat = new THREE.MeshPhysicalMaterial({
       color: 0xababab,
       map: woodTex,
@@ -191,6 +191,14 @@ export class Snowglobe {
     const baseMesh = new THREE.Mesh(baseGeo, baseMat);
     baseMesh.position.set(0, 0.1, 0);
     this.scene.add(baseMesh);
+
+    // add snow plane on base
+    const snowbaseGeo = new THREE.CircleGeometry(0.38, 32);
+    const snowbaseMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const snowbaseMesh = new THREE.Mesh(snowbaseGeo, snowbaseMat);
+    snowbaseMesh.position.set(0, 0.21, 0);
+    snowbaseMesh.rotateX(-Math.PI / 2);
+    this.scene.add(snowbaseMesh);
   }
 
   addEnvironment() {
@@ -341,7 +349,7 @@ class Snowflake {
     }
 
     this.rotationSpeed = Math.random() * 0.01;
-    this.speed = Math.random() * 0.001;
+    this.speed = Math.random(0.4, 1) * 0.001;
 
     this.mesh = new THREE.Mesh(geometry, material);
 
