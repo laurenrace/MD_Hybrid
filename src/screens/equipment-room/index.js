@@ -253,8 +253,9 @@ function gotStream(stream) {
   }
 
   videoElement.play();
+  const queryString = window.location.search;
 
-  mediasoupPeer.addTrack(videoTrack, "video");
+  mediasoupPeer.addTrack(videoTrack, queryString === "?360" ? "360" : "video");
   mediasoupPeer.addTrack(audioTrack, "audio");
 
   // Refresh button list in case labels have become available

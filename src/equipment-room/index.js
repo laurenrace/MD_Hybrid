@@ -21,7 +21,7 @@ function init() {
   // socket = io("https://yorb.itp.io", {
   //   path: "/hybrid/socket.io"
   // });
-  socket = io( `https://${window.location.host}:65156`, {
+  socket = io( `https://${window.location.hostname}:3095`, {
     path: "/socket.io"
   });
 
@@ -72,7 +72,13 @@ function gotTrack(track, id, label) {
 
       // el.style = "visibility: hidden;";
       document.body.appendChild(el);
-      portalScene.addWebcamVideo(el);
+      if (label === "360") {
+        portalScene.addEquirectangularVideo(el);
+      }
+      else {
+        portalScene.addWebcamVideo(el);
+      }
+      
     }
   }
 
@@ -177,9 +183,9 @@ class PortalScene {
     this.addLights();
     this.addStencil();
     this.addPortalSides();
-    const video = document.getElementById("testVideo");
-    video.play();
-    this.addEquirectangularVideo(video);
+    // const video = document.getElementById("testVideo");
+    // video.play();
+    // this.addEquirectangularVideo(video);
 
     this.loop();
   }
