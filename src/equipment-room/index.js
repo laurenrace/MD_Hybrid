@@ -21,7 +21,7 @@ function init() {
   // socket = io("https://yorb.itp.io", {
   //   path: "/hybrid/socket.io"
   // });
-  socket = io( `https://${window.location.hostname}:3095`, {
+  socket = io(`https://${window.location.hostname}:3095`, {
     path: "/socket.io"
   });
 
@@ -78,7 +78,7 @@ function gotTrack(track, id, label) {
       else {
         portalScene.addWebcamVideo(el);
       }
-      
+
     }
   }
 
@@ -193,8 +193,8 @@ class PortalScene {
   addWebcamVideo(videoEl) {
     console.log('adding webcam video', videoEl);
     const geometry = new THREE.PlaneGeometry(4, 4);
-    // invert the geometry on the x-axis so that all of the faces point inward
-    // geometry.scale(-1, 1, 1);
+    //invert geometry to get a reversed texture
+    geometry.scale(1, -1, 1);
 
     const texture = new THREE.VideoTexture(videoEl);
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
@@ -259,12 +259,12 @@ class PortalScene {
 
   addEquirectangularVideo(videoEl) {
     const geometry = new THREE.SphereGeometry(100, 60, 40);
-    // invert the geometry on the x-axis so that all of the faces point inward
-    geometry.scale(-1, 1, 1);
+    //invert geometry to get a reversed texture
+    geometry.scale(1, -1, 1);
 
     const texture = new THREE.VideoTexture(videoEl);
-    const material = new THREE.MeshBasicMaterial({ map: texture });
-
+    texture.minFilter = THREE.LinearFilter;
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
     mesh.layers.set(this.BACKGROUND_LAYER);
