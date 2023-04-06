@@ -76,7 +76,8 @@ function gotTrack(track, id, label) {
         portalScene.addEquirectangularVideo(el);
       }
       else {
-        portalScene.addWebcamVideo(el);
+        // add user's screen inside of the sphere if it's needed
+        // portalScene.addWebcamVideo(el);
       }
 
     }
