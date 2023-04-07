@@ -67,9 +67,26 @@
       text-overflow: ellipsis;
     }
 
-    button{
+    .myButton {
       position: relative;
       height: 30px;
+    }
+
+    .scrollPeersVideos {
+      /* keep elements in the same line */
+      display: flex;
+      flex-wrap: nowrap;
+      /* enable x-axis scroll*/
+      white-space: nowrap;
+      overflow-x: scroll;
+      height: 240px;
+    }
+
+    .scrollPeersVideosElement {
+      flex: 0 0 auto;
+      width: 320px;
+      height: 240px;
+      margin-right: 10px;
     }
   </style>
 </head>
@@ -104,7 +121,7 @@
               </h5>
             </div>
             <div class="row" style="min-height: 200px">
-              <div class="row" id="peersVideos">
+              <div class="col scrollPeersVideos" id="peersVideos">
                 <div class="text-center h-100" id="peersVideosPlaceHolder">
                   <p>no one here yet...</p>
                 </div>
@@ -135,18 +152,18 @@
             </div>
 
             <!-- LOBBY CONTROLS -->
-            <div class="row d-flex justify-content-center align-items-center">
+            <div class="row p-1 d-flex justify-content-center align-items-center">
               <div class="col-6">
-                <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive">
+                <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive myButton">
                     CAMERA ON
                   </button></label>
               </div>
               <div class="col-6"><select id="videoSource"></select></div>
             </div>
 
-            <div class="row align-self-center">
+            <div class="row p-1 align-self-center">
               <div class="col-6">
-                <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive">
+                <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive myButton">
                     MIC ON
                   </button></label>
               </div>
@@ -196,7 +213,7 @@
                         color: rgb(255, 255, 255);
                         background-color: rgb(90, 65, 255);
                       ">
-                    360VIEW
+                    360 VIEW
                   </h5>
                 </div>
                 <div class="row h-75">
@@ -250,7 +267,7 @@
                 <source src="../../assets/doorbell.mp3" type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
-              <button id="doorbellButton">RING THE DOORBELL 🔔</button>
+              <button id="doorbellButton myButton">RING THE DOORBELL 🔔</button>
             </p>
           </div>
 
@@ -258,7 +275,7 @@
             <!-- KNOCK ON DESK -->
             <p>
               <b><i>◯ Just get help from ER?</i></b><br />
-              <button id="knockButton">KNOCK ON ER DESK 🧑🏻‍💻</button>
+              <button id="knockButton myButton">KNOCK ON ER DESK 🧑🏻‍💻</button>
             </p>
           </div>
         </div>

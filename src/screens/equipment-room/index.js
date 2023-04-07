@@ -143,7 +143,7 @@ function gotTrack(track, id, label) {
       el.setAttribute("playsinline", true);
 
       const parentEl = document.createElement("div");
-      parentEl.className = "col";
+      parentEl.className = "col scrollPeersVideosElement";
       parentEl.appendChild(el);
       parentEl.id = id + "_video";
 
