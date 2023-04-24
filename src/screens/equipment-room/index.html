@@ -19,34 +19,10 @@
     html,
     body {
       font-family: 'Courier New', monospace;
-      background-color: rgb(255, 255, 255);
-      color: rgb(0, 0, 0);
-    }
-
-    .infoCard {
-      max-height: 240px;
-      overflow: scroll;
-      overflow-x: hidden;
-    }
-
-    /* infoCard scrollbar: Width */
-    .infoCard::-webkit-scrollbar {
-      width: 10px;
-    }
-
-    /* infoCard scrollbar:Track */
-    .infoCard::-webkit-scrollbar-track {
-      background: #eee;
-    }
-
-    /* infoCard scrollbar:Handle */
-    .infoCard::-webkit-scrollbar-thumb {
-      background: #888;
-    }
-
-    /* infoCard scrollbar:Handle on hover */
-    .infoCard::-webkit-scrollbar-thumb:hover {
-      background: #555;
+      background-color: rgb(231, 230, 255); 
+      color: rgb(35, 32, 91);
+      margin: 6px;
+      padding: 0;
     }
 
     .transcriptionArea {
@@ -68,9 +44,37 @@
       text-overflow: ellipsis;
     }
 
+
+
+    /* CSS */
     .myButton {
+      font-family: "Open Sans", sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-decoration: none;
+      text-transform: uppercase;
+      color: rgb(35, 32, 91);
+      cursor: pointer;
+      border: 1px solid;
+      padding: 0.25em 0.5em;
+      box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px;
       position: relative;
-      height: 30px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      border-radius: 6px;
+    }
+
+    .myButton:active {
+      box-shadow: 0px 0px 0px 0px;
+      top: 5px;
+      left: 5px;
+    }
+
+    @media (min-width: 768px) {
+      .myButton {
+        padding: 0.25em 0.75em;
+      }
     }
 
     .scrollPeersVideos {
@@ -96,19 +100,17 @@
 <body>
   <div class="container-fluid h-100">
     <!-- LEFT & RIGHT -->
-    <div class=" row justify-content-center p-1" style="background-color: rgb(255, 255, 255); height: 100vh">
+    <div class="row justify-content-center p-1" style="background-color: rgb(231, 230, 255); height: 100vh">
 
       <!-- LEFT -->
       <!-- 360VIEW & ASK FOR HELP -->
       <div class="col-md-8">
         <!-- 360VIEW -->
-        <div class="row justify-content-center p-1" style="margin-bottom: 40px;">
+        <div class="row justify-content-center shadow-sm shadow-primary shadow-intensity-lg rounded"
+          style="margin-left: 20px; margin-right: 20px; margin-bottom: 40px; background-color: rgb(255, 255, 255)">
           <div class="col">
             <div class="row">
-              <h5 style="
-                        color: rgb(255, 255, 255);
-                        background-color: rgb(90, 65, 255);
-                      ">
+              <h5 class="rounded-top" style="color: rgb(255, 255, 255);background-color: rgb(35, 32, 91);">
                 EQUIPMENT ROOM 360 VIEW
               </h5>
             </div>
@@ -119,8 +121,9 @@
         </div>
 
         <!-- ASK FOR HELP -->
-        <div class="row justify-content-center p-1">
-          <h5 style="color: white; background-color: rgb(255, 60, 0)">
+        <div class="row justify-content-center shadow-sm shadow-primary shadow-intensity-lg rounded"
+          style="margin-left: 20px; margin-right: 20px; background-color: rgb(255, 255, 255)">
+          <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(255, 60, 0)">
             ASK FOR HELP
           </h5>
           <div class="col">
@@ -149,60 +152,59 @@
       <!-- SELF & PEERS & CALENDAR-->
       <div class="col-md-4">
         <!-- SELF VIEW -->
-        <div class="row p-1">
-          <h5 style="
-                    color: rgb(255, 255, 255);
-                    background-color: rgb(90, 65, 255);
-                  ">
-            SELF VIEW
-          </h5>
-        </div>
+        <div class="row justify-content-center shadow-sm shadow-primary shadow-intensity-lg rounded"
+          style="margin-left: 20px; margin-right: 20px; margin-bottom: 40px; background-color: rgb(255, 255, 255)">
+          <div class="col">
+            <div class="row">
+              <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(35, 32, 91);">
+                SELF VIEW
+              </h5>
+            </div>
 
-        <!-- LOCAL VIDEO -->
-        <div class="col" style="margin-bottom: 40px;">
-          <div class="row">
-            <!-- select peer's video, local video scales down size, float on peer's video-->
-            <div class="col d-flex justify-content-center">
+            <!-- LOCAL VIDEO -->
+            <div class="col" style="margin-bottom: 40px;">
               <div class="row">
-                <video id="local_video" autoplay playsinline muted></video>
+                <!-- select peer's video, local video scales down size, float on peer's video-->
+                <div class="col d-flex justify-content-center">
+                  <div class="row">
+                    <video id="local_video" autoplay playsinline muted></video>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LOBBY CONTROLS -->
+              <div class="row p-1 d-flex justify-content-center align-items-center" style="margin-top: 10px;">
+                <div class="col-6">
+                  <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive myButton">
+                      CAMERA ON
+                    </button></label>
+                </div>
+                <div class="col-6"><select id="videoSource"></select></div>
+              </div>
+
+              <div class="row p-1 align-self-center">
+                <div class="col-6">
+                  <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive myButton">
+                      MIC ON
+                    </button></label>
+                </div>
+                <div class="col-6"><select id="audioSource"></select></div>
+              </div>
+
+              <div class="col align-self-center" style="display: none">
+                <div class="select">
+                  <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- LOBBY CONTROLS -->
-          <div class="row p-1 d-flex justify-content-center align-items-center">
-            <div class="col-6">
-              <label for="videoSource"><button id="toggleCameraPausedButton" class="buttonActive myButton">
-                  CAMERA ON
-                </button></label>
-            </div>
-            <div class="col-6"><select id="videoSource"></select></div>
-          </div>
-
-          <div class="row p-1 align-self-center">
-            <div class="col-6">
-              <label for="audioSource"><button id="toggleMicrophonePausedButton" class="buttonActive myButton">
-                  MIC ON
-                </button></label>
-            </div>
-            <div class="col-6"><select id="audioSource"></select></div>
-          </div>
-
-          <div class="col align-self-center" style="display: none">
-            <div class="select">
-              <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
-            </div>
-          </div>
         </div>
-
         <!-- PEERS' VIDEOS -->
-        <div class="row justify-content-center p-1">
+        <div class="row justify-content-center shadow-sm shadow-primary shadow-intensity-lg rounded"
+          style="margin-left: 20px; margin-right: 20px; margin-bottom: 40px; background-color: rgb(255, 255, 255)">
           <div class="col">
             <div class="row">
-              <h5 style="
-                    color: rgb(255, 255, 255);
-                    background-color: rgb(90, 65, 255);
-                  ">
+              <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(35, 32, 91);">
                 PEERS VIDEOS
               </h5>
             </div>
@@ -215,11 +217,9 @@
         </div>
 
         <!-- CALENDAR -->
-        <div class="row justify-content-center p-1">
-          <h5 style="
-                color: rgb(255, 255, 255);
-                background-color: rgb(90, 65, 255);
-              ">
+        <div class="row justify-content-center shadow-sm shadow-primary shadow-intensity-lg rounded"
+          style="margin-left: 20px; margin-right: 20px; background-color: rgb(255, 255, 255)">
+          <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(35, 32, 91);">
             CALENDAR
           </h5>
           <div id="listCalendar"
