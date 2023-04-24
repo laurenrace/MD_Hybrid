@@ -18,9 +18,10 @@
   <style>
     html,
     body {
-      font-family: 'Courier New', monospace;
+      /* font-family: 'Courier New', monospace; */
+      font-family: "Open Sans", sans-serif;
       background-color: rgb(231, 230, 255); 
-      color: rgb(35, 32, 91);
+      color: rgb(55, 0, 123);
       margin: 6px;
       padding: 0;
     }
@@ -53,7 +54,7 @@
       letter-spacing: 2px;
       text-decoration: none;
       text-transform: uppercase;
-      color: rgb(35, 32, 91);
+      color: rgb(55, 0, 123);
       cursor: pointer;
       border: 1px solid;
       padding: 0.25em 0.5em;
@@ -78,13 +79,11 @@
     }
 
     .scrollPeersVideos {
-      /* keep elements in a column */
       display: flex;
       flex-direction: column;
-      /* enable y-axis scroll */
       overflow-y: scroll;
-      height: 400px;
-      justify-content: center;
+      height: 445px;
+      /* justify-content: center; */
       align-items: center;
     }
 
@@ -110,7 +109,7 @@
           style="margin-left: 20px; margin-right: 20px; margin-bottom: 40px; background-color: rgb(255, 255, 255)">
           <div class="col">
             <div class="row">
-              <h5 class="rounded-top" style="color: rgb(255, 255, 255);background-color: rgb(35, 32, 91);">
+              <h5 class="rounded-top" style="color: rgb(255, 255, 255);background-color: rgb(91, 0, 195);">
                 EQUIPMENT ROOM 360 VIEW
               </h5>
             </div>
@@ -129,20 +128,20 @@
           <div class="col">
             <!-- DOORBELL -->
             <p>
-              <b><i>◯ Urgent, no one is around?</i></b><br />
+              <b>🔴 Urgent, no one is around?</b><br/>
               <audio id="doorbellSound">
                 <source src="../../assets/doorbell.mp3" type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
-              <button id="doorbellButton" class="myButton">RING THE DOORBELL 🔔</button>
+              <button  id="doorbellButton" class="myButton">RING THE DOORBELL 🔔</button>
             </p>
           </div>
 
           <div class="col">
             <!-- KNOCK ON DESK -->
             <p>
-              <b><i>◯ Just get help from ER?</i></b><br />
-              <button id="knockButton" class="myButton">KNOCK ON ER DESK 🧑🏻‍💻</button>
+              <b>🔴 Really need help from ER?</b><br/>
+              <button id="knockButton" class="myButton">KNOCK ON ER DESK (disabled for now) 🧑🏻‍💻</button>
             </p>
           </div>
         </div>
@@ -156,7 +155,7 @@
           style="margin-left: 20px; margin-right: 20px; margin-bottom: 40px; background-color: rgb(255, 255, 255)">
           <div class="col">
             <div class="row">
-              <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(35, 32, 91);">
+              <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(91, 0, 195);">
                 SELF VIEW
               </h5>
             </div>
@@ -164,7 +163,6 @@
             <!-- LOCAL VIDEO -->
             <div class="col" style="margin-bottom: 40px;">
               <div class="row">
-                <!-- select peer's video, local video scales down size, float on peer's video-->
                 <div class="col d-flex justify-content-center">
                   <div class="row">
                     <video id="local_video" autoplay playsinline muted></video>
@@ -204,13 +202,13 @@
           style="margin-left: 20px; margin-right: 20px; margin-bottom: 40px; background-color: rgb(255, 255, 255)">
           <div class="col">
             <div class="row">
-              <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(35, 32, 91);">
+              <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(91, 0, 195);">
                 PEERS VIDEOS
               </h5>
             </div>
-            <div class="row" style="min-height: 400px; margin-bottom: 40px;">
+            <div class="row">
               <div class="col scrollPeersVideos" id="peersVideos">
-                <div class="h-100" id="peersVideosPlaceHolder">no one here yet...</div>
+                <div id="peersVideosPlaceHolder">no one here yet...</div>
               </div>
             </div>
           </div>
@@ -219,7 +217,7 @@
         <!-- CALENDAR -->
         <div class="row justify-content-center shadow-sm shadow-primary shadow-intensity-lg rounded"
           style="margin-left: 20px; margin-right: 20px; background-color: rgb(255, 255, 255)">
-          <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(35, 32, 91);">
+          <h5 class="rounded-top" style="color: rgb(255, 255, 255); background-color: rgb(91, 0, 195);">
             CALENDAR
           </h5>
           <div id="listCalendar"
